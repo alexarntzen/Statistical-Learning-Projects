@@ -1,7 +1,7 @@
 ---
 subtitle: "TMA4268 Statistical Learning V2019"
-title: "Compulsory exercise 1: Group XYZ (add your group number here)"
-author: "NN1, NN2 and NN3 (full names of all group members)"
+title: "Compulsory exercise 1: Group 12"
+author: "Emma Skarnes, Håkon Noren  and Alexander Johan Arntzen"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   # html_document
@@ -36,11 +36,46 @@ library(dplyr)
 For this problem you will need to include some LaTex code. Please install latex on your computer and then consult Compulsor1.Rmd for hints how to write formulas in LaTex.
 
 ## a)
+The expected test mean squared error (MSE) at "x_{0}" is 
+$$
+ E[y_{0} -\hat{f}(x_{0}) ]^{2}.
+ \eqref{eq:1}
+$$
 
+Where $y_{0}$ is the new observation.
 ## b)
 
-## c)
+Firstly we from computation it is clear that 
+$$
+\begin{align}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\E}{\mathrm{E}}
+\E[ f( x_{0}) -\hat{f}( x_{0})]^{2} & =\E[ f( x_{0}) -\E[\hat{f}( x_{0})] +\E[\hat{f}( x_{0})] -\hat{f}( x_{0})]^{2}\\
+ & =\E[ f( x_{0}) -\E[\hat{f}( x_{0})]]^{2} +2\E[ f( x_{0}) -\E[\hat{f}( x_{0})] \ ][ \E[\hat{f}( x_{0})] -\hat{f}( x_{0})] +\E[ \E[\hat{f}( x_{0})] -\hat{f}( x_{0})]^{2}\\
+ & =( f( x_{0}) -\E[\hat{f}( x_{0})])^{2} \  + \Var[ f( x_{0})].
+\end{align}
+$$
+Secondly note that $y_0$ and the training data are independent. In addition $\mathrm{E}[ \epsilon ] \ =\ 0 $ Then expanding equation $\ref{eq:1.1}$ and using equation $\ref{eq:1.2}$ the decomposition becomes 
 
+$$
+\begin{align}
+\E[ y_{0} -\hat{f}( x_{0})]^{2} & \ =\E[ f( x_{0}) +\epsilon -\hat{f}( x_{0})]^{2}\\
+ & =\E[ \epsilon - \E[ \epsilon ]]^{2} +2\E[ \epsilon ] \E[ f( x_{0}) -\hat{f}( x_{0})] +\E[ f( x_{0}) -\hat{f}( x_{0})]^{2} \ \\
+ & =\Var[ \epsilon ] + [ f( x_{0}) - \E[\hat{f}( x_{0})]]^{2}   + \Var[ f( x_{0})].
+\end{align}
+$$
+## c)
+Since variance and sqared expression cannot be negative each of the three terms constributes to the expected test MSE at $x_0$. The
+
+$\pmb{\Var[ \epsilon ]}$ is the **irreducible errror**. It is independenet of the model and cannot be reduced. 
+
+
+$\pmb{\Var[ f( x_{0})]}$ is the **variance** of the prediction at $x_{0}. It is a measure of how much the model will change based on different training data. In genereal the variance of the model increases with the flexibileity of the model. 
+
+$[ f( x_{0}) - \E[\hat{f}( x_{0})]]^{2}$ is the **sqared bias** at $x_{0}$, also denoted $\mathrm{Bias}(\hat{f}( x_{0}))]^{2}$  In general less flexible models will have high bias. 
+
+
+In genereal the a flexible models will have higer variance and lower bias. A good model will have low bias and low variance. 
 ## d)
 
 ## e)
@@ -54,9 +89,9 @@ For this problem you will need to include some LaTex code. Please install latex 
 Here is a code chunk:
 
 ```{r, eval=TRUE}
-id <- "1nLen1ckdnX4P9n8ShZeU7zbXpLc7qiwt" # google file ID
-d.worm <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id))
-head(d.worm)
+#id <- "1nLen1ckdnX4P9n8ShZeU7zbXpLc7qiwt" # google file ID
+#d.worm <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id))
+#head(d.worm)
 ```
 
 
