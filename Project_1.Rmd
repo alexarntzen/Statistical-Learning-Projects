@@ -103,21 +103,56 @@ Here is a code chunk:
 
 
 ## a)
+The dataset consists of 143 rows and 5 columns. This can for example be seen from running the function str(d.worm).
+The qualitative variables are Gattung, FANGDATUM and Nummer, while the quantitative variables are GEWICHT and MAGENUMF.
+SJEKK DETTE !!!
 
 
 ## b) 
-Below you have to complete the code and then replace `eval=FALSE` by `eval=TRUE` in the chunk options:
-```{r, eval=FALSE, echo=TRUE}
-ggplot(d.worm,aes(x= ... ,y=  ... ,colour= ...)) + geom_point() + theme_bw()
-```
+```{r, eval=TRUE, echo=TRUE, fig.width=8, fig.height=6}
+# Change figure dimensions? Standard width 4 and height 3
+ggplot(d.worm, aes(x = GEWICHT, y = MAGENUMF, colour = Gattung)) + geom_point() + theme_bw()
 
-Note that the default figure width and height have been set globally as `fig.width=4, fig.height=3`, but if you would like to change that (e.g., due to space constraints), you can include a different width and height directly into the chunk options, again using `fig.width=..., fig.height=...`.
+# Transform to get a linear relationship
+ggplot(d.worm, aes(x = log(GEWICHT), y = log(MAGENUMF), colour = Gattung)) + geom_point() + theme_bw()
+```
+The relationship in the original scatterplot does not look linear, so we linearize it by transforming the quantitative variables. 
+
 
 ## c)
+```{r, eval=TRUE, echo=TRUE}
+fit.lm = lm(log(GEWICHT) ~ log(MAGENUMF) + Gattung, data = d.worm) # Fitting a reg. model
+summary(fit.lm)
+anova(fit.lm)
+
+# Separate reg. models and equations
+```
+
+We can see that Gattung seems to be a relevant predictor since the p-values for the different species are high, and so is the F-statistic. This implies ...
 
 ## d)
+```{r, eval=TRUE, echo=TRUE}
+# Test interaction term
+fit.lmInter = lm(log(GEWICHT) ~ log(MAGENUMF) * Gattung, data = d.worm)
+summary(fit.lmInter)
+anova(fit.lmInter)
+```
+Comment on whether the interaction term is relevant or not ++
 
 ## e)
+```{r,eval=TRUE, echo=TRUE}
+autoplot(fit.lm)   # Residual analysis on our regression model
+
+# Compare to the model without transformed variables 
+fit.lm1 = lm(GEWICHT ~ MAGENUMF + Gattung, data = d.worm)
+autoplot(fit.lm1, smooth.colour = NA)
+```
+The Residuals vs. fitted plot, or Tukey-Anscombe, seems to be nonlinear, which is how we want the residuals to behave. 
+We have some outliers in the QQ-plot, especially points 7, 96 and 2. However, the majority of the points are making up a fairly straight line, so some outliers does not imply that our assumptions are violated. 
+In the Scale-Location plot, the points seems to gather a little bit as the x-value, fitted values, increases. This can be a sign of non-equal variances, which is violating our assumptions. 
+The Constant Leverage: Residuals vs Factor Levels plot, we can see that the spread of the points seems to differ based on the species. While there is only one outlier for the Lumbricus species, there are more outliers for the two other species, even though these are not as far from the majority as the outlier in L.
+<b> ??? </b>
+
 
 ## f)
 
