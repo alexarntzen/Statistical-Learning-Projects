@@ -4,8 +4,8 @@ title: "Compulsory exercise 1: Group 12"
 author: "Emma Skarnes, Håkon Noren  and Alexander Johan Arntzen"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
-  # html_document
-  pdf_document
+  html_document
+  #pdf_document
 ---
   
 ```{r setup, include=FALSE}
@@ -96,9 +96,9 @@ C
 Here is a code chunk:
 
 ```{r, eval=TRUE}
-#id <- "1nLen1ckdnX4P9n8ShZeU7zbXpLc7qiwt" # google file ID
-#d.worm <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id))
-#head(d.worm)
+id <- "1nLen1ckdnX4P9n8ShZeU7zbXpLc7qiwt" # google file ID
+d.worm <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id))
+head(d.worm)
 ```
 
 
@@ -165,7 +165,7 @@ In this problem, we will use a dataset from the Wimbledon tennis tournament for 
 
 The files can be read using the following code.
 
-```{r rpackages,eval=TRUE,echo=FALSE}
+```{r,eval=TRUE,echo=FALSE}
 # read file
 id <- "1GNbIhjdhuwPOBr0Qz82JMkdjUVBuSoZd"
 tennis <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", 
@@ -221,7 +221,7 @@ We provide an interpretation of how the coefficients $\beta_i$ affect $p_i$ by l
 Hence we see that the odds will increase with a factor of $\beta_1$  if player 1 has one more ace, $x_{i1}' = x_{i1} + 1 $. As $\beta_1 = 0.36338$ we know that one more ace for player 1 will increase the likelihood for player 1 winning the match with a factor of $e^{0.36338} \approx 1.438$, in our model.
 
 
-```{r rpackages,eval=TRUE,echo=FALSE}
+```{r,eval=TRUE,echo=FALSE}
 r.tennis = glm(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennis, family = "binomial")
 summary(r.tennis)
 ```
@@ -242,7 +242,7 @@ Hence we can plot the line $y = ax + b$ with $a = -\frac{\beta_1}{\beta_2}$ and 
 
 We can now provide a plot with `ACEdiff` as x-axis, `UFEdiff` as y-axis, color the points to indicate win or loss together with our computed boundary. This gives a visual understanding of our classification model. 
 
-```{r rpackages,eval=TRUE,echo=FALSE}
+```{r ,eval=TRUE,echo=FALSE}
 # make variables for difference
 tennis$ACEdiff = tennis$ACE.1 - tennis$ACE.2
 tennis$UFEdiff = tennis$UFE.1 - tennis$UFE.2
@@ -257,7 +257,7 @@ tennisTrain = tennis[train, ]
 ```
 
 
-```{r rpackages,eval=TRUE,echo=FALSE}
+```{r ,eval=TRUE,echo=FALSE}
 r.tennisLogres = glm(Result ~ ACEdiff + UFEdiff, data = tennisTrain, family = "binomial")
 
 beta = r.tennisLogres$coefficients
@@ -283,7 +283,7 @@ $$
 \frac{\text{TN}}{\text{N}}
 $$
 
-```{r rpackages,eval=TRUE,echo=FALSE}
+```{r ,eval=TRUE,echo=FALSE}
 tennisLogresPred = predict(r.tennisLogres, newdata = tennisTest,type="response")
 tennisLogresResult = ifelse(tennisLogresPred < 0.5,0,1)
 tennisLogresCM = table(real = tennisTest$Result,pred=tennisLogresResult)
@@ -406,7 +406,7 @@ $$
 
 
 
-```{r rpackages,eval=TRUE,echo=FALSE}
+```{r,eval=TRUE,echo=FALSE}
 n = nrow(tennisTrain)
 
 r1 = tennisTrain[tennisTrain$Result == 1,]
@@ -494,7 +494,7 @@ ACEdiff = ACE1 - ACE2
 Hence we would prefer to use glm or LDA. However, as LDA has a slightly better probability of classifying the matches where player 1 won, it could be preferable if we care more about predicting wins than losses.
 
 
-```{r rpackages,eval=TRUE,echo=FALSE}
+```{r,eval=TRUE,echo=FALSE}
 tennis_classification = function(runs) {
     res = matrix(0L,nrow=3,ncol=2)
     
@@ -586,7 +586,7 @@ testPlotFemale
 
 testPlotMale 
 ```
-"The probability of chd for a male with a sbp=140 is `r chdProbability`.
+"The probability of chd for a male with a sbp=140 is .
 
 
 ## d)
@@ -628,8 +628,9 @@ high = Rfast::nth(probs, 26, descending = TRUE)
 
 
 ```
-from the probabilies we get a standard error of `r stdError`.A $95\%$ confidence interval for the the estimator of $P(\mathrm{chd} | \mathrm{sex= male},\mathrm{sbp=40})$ is [ `r low` ,`r high`]. 
-If we assume the estimated distribution to be true it means that the estimator will take values in [ `r low` ,`r high`]  $95\%$ of the time. This indicates that the estimator has a high variance, but we don't know if it has low or high bias. 
+from the probabilies we get a standard error of r stdError.A $95\%$ confidence interval for the the estimator of $P(\mathrm{chd} | \mathrm{sex= male},\mathrm{sbp=40})$ is [ `
+r low ,r high]. 
+If we assume the estimated distribution to be true it means that the estimator will take values in [ r low ,r high]  $95\%$ of the time. This indicates that the estimator has a high variance, but we don't know if it has low or high bias. 
 
 
 
