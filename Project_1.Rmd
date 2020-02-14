@@ -92,10 +92,7 @@ TRUE, FALSE, TRUE, FALSE.
 C
 
 # Problem 2
-
-Here is a code chunk:
-
-```{r, eval=TRUE}
+```{r, eval=TRUE, echo=FALSE}
 id <- "1nLen1ckdnX4P9n8ShZeU7zbXpLc7qiwt" # google file ID
 d.worm <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id))
 head(d.worm)
@@ -103,20 +100,18 @@ head(d.worm)
 
 
 ## a)
-The dataset consists of 143 rows and 5 columns. This can for example be seen from running the function str(d.worm).
+The dataset consists of 143 rows and 5 columns, which can be seen from running the $str()$-function.
 The qualitative variables are Gattung, FANGDATUM and Nummer, while the quantitative variables are GEWICHT and MAGENUMF.
-SJEKK DETTE !!!
 
 
 ## b) 
-```{r, eval=TRUE, echo=TRUE, fig.width=8, fig.height=6}
-# Change figure dimensions? Standard width 4 and height 3
-ggplot(d.worm, aes(x = GEWICHT, y = MAGENUMF, colour = Gattung)) + geom_point() + theme_bw()
-
-# Transform to get a linear relationship
-ggplot(d.worm, aes(x = log(GEWICHT), y = log(MAGENUMF), colour = Gattung)) + geom_point() + theme_bw()
+```{r, eval=TRUE, echo=TRUE, fig.width=4, fig.height=3}
+ggplot(d.worm, aes(x = MAGENUMF, y = GEWICHT, colour = Gattung)) + geom_point() + theme_bw()
 ```
-The relationship in the original scatterplot does not look linear, so we linearize it by transforming the quantitative variables. 
+The relationship in this scatterplot does not look linear, so we linearize it by transforming the quantitative variables. Here, we take the logarithm of both:
+```{r, eval=TRUE, echo=TRUE}
+ggplot(d.worm, aes(x = log(MAGENUMF), y = log(GEWICHT), colour = Gattung)) + geom_point() + theme_bw()
+```
 
 
 ## c)
@@ -124,11 +119,38 @@ The relationship in the original scatterplot does not look linear, so we lineari
 fit.lm = lm(log(GEWICHT) ~ log(MAGENUMF) + Gattung, data = d.worm) # Fitting a reg. model
 summary(fit.lm)
 anova(fit.lm)
-
-# Separate reg. models and equations
 ```
 
-We can see that Gattung seems to be a relevant predictor since the p-values for the different species are high, and so is the F-statistic. This implies ...
+To get the separate regression models, we have to change the dummy variable, or the reference category.
+```{r, eval=TRUE, echo=TRUE}
+d.worm = mutate(d.worm, Gattung = relevel(Gattung, ref = "N"))  # reference category "N"
+fit.lmN = lm(log(GEWICHT) ~ log(MAGENUMF) + Gattung, data = d.worm)
+summary(fit.lmN)
+anova(fit.lmN)
+
+d.worm = mutate(d.worm, Gattung = relevel(Gattung, ref = "Oc"))
+fit.lmOc = lm(log(GEWICHT) ~ log(MAGENUMF) + Gattung, data = d.worm)
+summary(fit.lmOc)
+anova(fit.lmOc)
+```
+
+The separate equations where the three different species are the reference categories are thus on the form
+
+$$
+\text{log(GEWICHT)} = \hat{\beta_0} + \hat{\beta_1} \text{log(MAGENUMF)} + \hat{\beta_2} \text{Gattung}_1 + \hat{\beta_3} \text{Gattung}_2,
+$$
+where the subscripts 1 and 2 correspond to the factor levels of Gattung who are not the reference category. These equations are given by
+
+$$
+\text{log(GEWICHT)} = -3.13865 + 2.59310 \cdot \text{log(MAGENUMF)} + 0.07327 \cdot \text{Gattung}_N - 0.06149 \cdot \text{Gattung}_{Oc} \quad \text{Ref. = "L"} \\
+
+\text{log(GEWICHT)} = -3.06538 + 2.59310 \cdot \text{log(MAGENUMF)} - 0.07327 \cdot \text{Gattung}_L - 0.13476 \cdot \text{Gattung}_{Oc} \quad \text{Ref. = "N"} \\
+
+\text{log(GEWICHT)} = -3.20013 + 2.59310 \cdot \text{log(MAGENUMF)} + 0.13476 \cdot \text{Gattung}_N + 0.06149 \cdot \text{Gattung}_{L} \quad \text{Ref. = "Oc"}
+$$
+MÅ FINNE UT OM DETTE ER RIKTIG TOLKNING AV SPØRSMÅLET!!
+
+
 
 ## d)
 ```{r, eval=TRUE, echo=TRUE}
@@ -155,8 +177,12 @@ The Constant Leverage: Residuals vs Factor Levels plot, we can see that the spre
 
 
 ## f)
+It is important to carry out a residual analysis since we should verify that the underlying assumptions are not violated - if they are so, the model is not valid.
+In case of violated assumptions, we can for instance remove the outliers and fit the model over again, or we can try other transformations of the predictor value(s). 
 
 ## g)
+FALSE, FALSE, FALSE, TRUE.
+<font color = red>SJEKK DENNE!!</font>
 
 
 # Problem 3
