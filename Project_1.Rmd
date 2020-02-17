@@ -215,7 +215,7 @@ tennis <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",
 summary(tennis)
 ```
 
-# Problem 3 a)
+## a)
 
 Probability to win for player 1 given by a logistic regression model:
 
@@ -229,7 +229,7 @@ $$
 \beta_0 + \beta_1x_{i1} + \beta_2 x_{i2} + \beta_3x_{i3} + \beta_4 x_{i4} = \beta x
 $$
 
-furthermore we know that
+Furthermore we know that
 
 $$
 \begin{aligned}
@@ -251,40 +251,45 @@ $$
 \end{aligned}
 $$
 
-# Problem 3 b)
+## b)
 
 We provide an interpretation of how the coefficients $\beta_i$ affect $p_i$ by looking at the relative change in odds $\frac{p_i}{1-p_i}$ when increasing a covariate $\beta_i$.
 
+$$
 \begin{aligned}
 \frac{\text{odds}(Y_i=1 \mid X_{1} = x_{i1} + 1)}{\text{odds}(Y_i=1 \mid X_j = x_{ij})} &= \frac{e^{\beta_0 + \beta_1 (x_{i1} + 1) + \beta_2 x_{i2} + \beta_3x_{i3} + \beta_4 x_{i4}}}{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2} + \beta_3x_{i3} + \beta_4 x_{i4}}} \\
 &= e^{\beta_11}
 \end{aligned}
+$$
 
 Hence we see that the odds will increase with a factor of $\beta_1$  if player 1 has one more ace, $x_{i1}' = x_{i1} + 1 $. As $\beta_1 = 0.36338$ we know that one more ace for player 1 will increase the likelihood for player 1 winning the match with a factor of $e^{0.36338} \approx 1.438$, in our model.
 
 
-```{r,eval=TRUE,echo=FALSE}
+```{r,eval=TRUE,echo=FALSE} 
+# CHANGE echo TO TRUE, REF. PRACTICAL ISSUES IN THE PROBLEM TEXT?
 r.tennis = glm(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennis, family = "binomial")
 summary(r.tennis)
 ```
 
-# Problem 3 c)
+## c)
 
 We will now use a $0.5$ cutoff rule, meaning we classify an observation $\boldsymbol{x}$ as a win for player 1 if $P(Y = 1 | x) > 0.5$. We find the boundary from
 
+$$
 \begin{aligned}
 P(Y_i = 1| {\bf X}={\boldsymbol{x}}_i) &= p_i \\
 &= \frac{e^{\beta x}}{ 1+ e^{\beta x}} = 0.5 \\
-&= e^{\beta x} = 1 \\
+&= e^{\beta x} = 1 \\   
 &= \beta_0 + \beta_1 x_{1} + \beta_2 x_{2} = 0 \\
 &\implies x_2 = -\frac{\beta_1}{\beta_2}x_1 - \frac{\beta_0}{\beta_2}
 \end{aligned}
-
+$$
+<font color = red>REMOVE = IN THE START OF LINES 3 AND 4</font>
 Hence we can plot the line $y = ax + b$ with $a = -\frac{\beta_1}{\beta_2}$ and $b = -\frac{\beta_0}{\beta_2}$.
 
 We can now provide a plot with `ACEdiff` as x-axis, `UFEdiff` as y-axis, color the points to indicate win or loss together with our computed boundary. This gives a visual understanding of our classification model. 
 
-```{r ,eval=TRUE,echo=FALSE}
+```{r ,eval=TRUE,echo=TRUE}
 # make variables for difference
 tennis$ACEdiff = tennis$ACE.1 - tennis$ACE.2
 tennis$UFEdiff = tennis$UFE.1 - tennis$UFE.2
@@ -299,7 +304,7 @@ tennisTrain = tennis[train, ]
 ```
 
 
-```{r ,eval=TRUE,echo=FALSE}
+```{r ,eval=TRUE,echo=TRUE}
 r.tennisLogres = glm(Result ~ ACEdiff + UFEdiff, data = tennisTrain, family = "binomial")
 
 beta = r.tennisLogres$coefficients
@@ -337,7 +342,7 @@ specLogres = tennisLogresCM[1,1]/sum(tennisLogresCM[1,])
 print(paste0("Specificity: ", specLogres))
 ```
 
-# Problem 3 d)
+## d)
 
 We will now use Linear discriminant analysis (LDA) to classify in the same manner as we did above. Using LDA we assume that our data follow known normal distributions, and we use Bayes theorem to find $P(Y|X)$. Given that we have $K$ classes we find the posterior probability by
 
@@ -368,13 +373,15 @@ Which we use to find the use the following estimator for the covariance
 $$
 \hat{\boldsymbol{\Sigma}}= \sum_{k=1}^K \frac{n_k - 1}{n - K} \cdot \hat{\boldsymbol{\Sigma}}_k
 $$
+DO WE NEED MORE ABOUT WHAT f_k(x) IS???
 
-# Problem 3 e)
+## e)
 
 **Expression **
 
 We will now derive an expression for $\delta_0({\boldsymbol x}) = \delta_1({\boldsymbol x})$ starting with
 
+$$
 \begin{aligned}
 P(Y=0 | {\bf X}={\boldsymbol x}) &= P(Y=1 | {\bf X}={\boldsymbol x}) \\
 \\
@@ -384,6 +391,7 @@ P(Y=0 | {\bf X}={\boldsymbol x}) &= P(Y=1 | {\bf X}={\boldsymbol x}) \\
 \pi_0 f_0({\boldsymbol x})
 &= \pi_1 f_1({\boldsymbol x})
 \end{aligned}
+$$
 
 Where $f_k(\boldsymbol{x})$ is defined as 
 
@@ -391,7 +399,7 @@ $$
 f_k({\boldsymbol x}) = \frac{1}{(2 \pi)^{p/2}|\boldsymbol{\Sigma}|^{1/2}}e^{-\dfrac{1}{2}({\boldsymbol x}-\boldsymbol{\mu_k})^T \boldsymbol{\Sigma}^{-1}({\boldsymbol x}-\boldsymbol{\mu_k})}
 $$
 
-We see that the term outside the exponent cancels because of the assumption that $\Sigma_0 = \Sigma_1 = \Sigma$, hence we take $\log$ on both side to get:
+We see that the term outside the exponent cancels because of the assumption that $\Sigma_0 = \Sigma_1 = \Sigma$, hence we take $\log$ on both sides to get:
 
 $$
 \begin{aligned}
@@ -448,7 +456,7 @@ $$
 
 
 
-```{r,eval=TRUE,echo=FALSE}
+```{r,eval=TRUE,echo=TRUE}
 n = nrow(tennisTrain)
 
 r1 = tennisTrain[tennisTrain$Result == 1,]
@@ -477,8 +485,8 @@ plot
 ```
 
 
-## Problem 3f)
-```{r}
+## f)
+```{r, eval=TRUE, echo=TRUE}
 r.tennisLDA = lda(Result ~ ACEdiff + UFEdiff, data = tennisTrain)
 tennisLDAPred = predict(r.tennisLDA, tennisTest)$class
 
@@ -491,10 +499,10 @@ specLDA = tennisLDACM[1,1]/sum(tennisLDACM[1,])
 print(paste0("Specificity: ", specLDA))
 ```
 
-## Problem 3g)
+## g)
 
-When we derived the decision boundary for LDA we assumed that each class have equal covariance matrix. For QDA we do not assume this and hence the quadratic terms of $x$ does not cancel and we obviously get a decision boundary that is quadratic.
-```{r}
+When we derived the decision boundary for LDA we assumed that each class have equal covariance matrices. For QDA we do not assume this and hence the quadratic terms of $x$ do not cancel and we obviously get a decision boundary that is quadratic.
+```{r, eval=TRUE, echo=TRUE}
 r.tennisQDA = qda(Result ~ ACEdiff + UFEdiff, data = tennisTrain)
 tennisQDAPred = predict(r.tennisQDA, tennisTest)$class
 
@@ -507,7 +515,7 @@ specQDA = tennisQDACM[1,1]/sum(tennisQDACM[1,])
 print(paste0("Specificity: ", specQDA))
 ```
 
-## Problem 3h)
+## h)
 
 For one run with $\text{seed} = 1234$ we get the following sensitivity and specificity for the different methods. 
 
@@ -528,7 +536,7 @@ However, in order to get a result that is not dependent on only one sample, we c
 First of all, the performance differences between the methods are not that great, but we see that QDA has a somewhat weaker specificity, which means it is weaker at separating the "negatives", meaning the cases where player 1 lost the match. This could imply that the best model for 'ACEdiff' and 'UFEdiff' is linear, not quadratic as shown in Figure 3. It also seems reasonable that the descision boundary should increase on the whole domain, but in Figure 3 we observe a decreasing slope for $\text{ACEdiff}<  -5$. This means that when player 2 has a relative lead of 5 aces or more, player 1 is suddenly "allowed" to have a relative larger number of unforced errors, for the match to be a likely win for player 1. This does not make intuitive sense.
 
 
-```
+```{r, eval=TRUE, echo=TRUE}
 UFEdiff = UFE1 - UFE2
 ACEdiff = ACE1 - ACE2
 ```
@@ -536,7 +544,7 @@ ACEdiff = ACE1 - ACE2
 Hence we would prefer to use glm or LDA. However, as LDA has a slightly better probability of classifying the matches where player 1 won, it could be preferable if we care more about predicting wins than losses.
 
 
-```{r,eval=TRUE,echo=FALSE}
+```{r,eval=TRUE,echo=TRUE}
 tennis_classification = function(runs) {
     res = matrix(0L,nrow=3,ncol=2)
     
