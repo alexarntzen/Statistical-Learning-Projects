@@ -40,26 +40,33 @@ theme_set(theme_bw())
 For this problem you will need to include some LaTex code. Please install latex on your computer and then consult Compulsor1.Rmd for hints how to write formulas in LaTex.
 
 ## a)
-The expected test mean squared error (MSE) at "x_{0}" is 
+The expected test mean squared error (MSE) at $x_{0}$ is 
 $$
- E[y_{0} -\hat{f}(x_{0}) ]^{2}.
- \eqref{eq:1}
+\begin{equation}
+  E[y_{0} -\hat{f}(x_{0}) ]^{2}.
+  \label{eq1}
+  \tag{1}
+\end{equation}
 $$
 
 Where $y_{0}$ is the new observation.
 ## b)
 
-Firstly we from computation it is clear that 
+Firstly, from computation it is clear that 
 $$
-\begin{align}
-\newcommand{\Var}{\mathrm{Var}}
-\newcommand{\E}{\mathrm{E}}
-\E[ f( x_{0}) -\hat{f}( x_{0})]^{2} & =\E[ f( x_{0}) -\E[\hat{f}( x_{0})] +\E[\hat{f}( x_{0})] -\hat{f}( x_{0})]^{2}\\
+\begin{equation}
+  \begin{align}
+    \newcommand{\Var}{\mathrm{Var}}
+    \newcommand{\E}{\mathrm{E}}
+    \E[ f( x_{0}) -\hat{f}( x_{0})]^{2} & =\E[ f( x_{0}) -\E[\hat{f}( x_{0})] +\E[\hat{f}( x_{0})] -\hat{f}( x_{0})]^{2}\\
  & =\E[ f( x_{0}) -\E[\hat{f}( x_{0})]]^{2} +2\E[ f( x_{0}) -\E[\hat{f}( x_{0})] \ ][ \E[\hat{f}( x_{0})] -\hat{f}( x_{0})] +\E[ \E[\hat{f}( x_{0})] -\hat{f}( x_{0})]^{2}\\
  & =( f( x_{0}) -\E[\hat{f}( x_{0})])^{2} \  + \Var[ f( x_{0})].
-\end{align}
+  \end{align}
+  \label{eq2}
+  \tag{2}
+\end{equation}
 $$
-Secondly note that $y_0$ and the training data are independent. In addition $\mathrm{E}[ \epsilon ] \ =\ 0 $ Then expanding equation $\ref{eq:1.1}$ and using equation $\ref{eq:1.2}$ the decomposition becomes 
+Secondly note that $y_0$ and the training data are independent. In addition $\mathrm{E}[ \epsilon ] \ =\ 0 $. Then expanding equation $\eqref{eq1}$ and using equation $\eqref{eq2}$ the decomposition becomes 
 
 $$
 \begin{align}
@@ -74,9 +81,9 @@ Since variance and squared expression cannot be negative each of the three terms
 $\pmb{\Var[ \epsilon ]}$ is the **irreducible error**. It is independent of the model and cannot be reduced. 
 
 
-$\pmb{\Var[ f( x_{0})]}$ is the **variance** of the prediction at $x_{0}. It is a measure of how much the model will change based on different training data. In general the variance of the model decreases with the flexibility of the model. x
+$\pmb{\Var[ f( x_{0})]}$ is the **variance** of the prediction at $x_{0}$. It is a measure of how much the model will change based on different training data. In general the variance of the model decreases with the flexibility of the model. x
 
-$[ f( x_{0}) - \E[\hat{f}( x_{0})]]^{2}$ is the **squared bias** at $x_{0}$, also denoted $\mathrm{Bias}(\hat{f}( x_{0}))]^{2}$. It is a measure of much the model differs from the target function $f$ at $x_{0}$. In general a flexible model will have low bias. For example
+$[ f( x_{0}) - \E[\hat{f}( x_{0})]]^{2}$ is the **squared bias** at $x_{0}$, also denoted $\mathrm{Bias}(\hat{f}( x_{0}))^{2}$. It is a measure of much the model differs from the target function $f$ at $x_{0}$. In general a flexible model will have low bias. For example
 
 
 A good model will strike a balance between bias and variance to achieve a low total expected test MSE. 
@@ -634,7 +641,7 @@ testPlotFemale
 
 testPlotMale 
 ```
-"The probability of chd for a male with a sbp=140 is .
+The probability of chd for a male with a sbp=140 is .
 
 
 ## d)
@@ -676,7 +683,7 @@ high = Rfast::nth(probs, 26, descending = TRUE)
 
 
 ```
-from the probabilies we get a standard error of r stdError.A $95\%$ confidence interval for the the estimator of $P(\mathrm{chd} | \mathrm{sex= male},\mathrm{sbp=40})$ is [ `
+From the probabilies we get a standard error of r stdError.A $95\%$ confidence interval for the the estimator of $P(\mathrm{chd} | \mathrm{sex= male},\mathrm{sbp=40})$ is [ `
 r low ,r high]. 
 If we assume the estimated distribution to be true it means that the estimator will take values in [ r low ,r high]  $95\%$ of the time. This indicates that the estimator has a high variance, but we don't know if it has low or high bias. 
 
