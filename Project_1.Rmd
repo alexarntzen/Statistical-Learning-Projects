@@ -279,12 +279,11 @@ $$
 \begin{aligned}
 P(Y_i = 1| {\bf X}={\boldsymbol{x}}_i) &= p_i \\
 &= \frac{e^{\beta x}}{ 1+ e^{\beta x}} = 0.5 \\
-&= e^{\beta x} = 1 \\   
-&= \beta_0 + \beta_1 x_{1} + \beta_2 x_{2} = 0 \\
+&\implies e^{\beta x} = 1 \\   
+&\implies \beta_0 + \beta_1 x_{1} + \beta_2 x_{2} = 0 \\
 &\implies x_2 = -\frac{\beta_1}{\beta_2}x_1 - \frac{\beta_0}{\beta_2}
 \end{aligned}
 $$
-<font color = red>REMOVE = IN THE START OF LINES 3 AND 4</font>
 Hence we can plot the line $y = ax + b$ with $a = -\frac{\beta_1}{\beta_2}$ and $b = -\frac{\beta_0}{\beta_2}$.
 
 We can now provide a plot with `ACEdiff` as x-axis, `UFEdiff` as y-axis, color the points to indicate win or loss together with our computed boundary. This gives a visual understanding of our classification model. 
@@ -373,7 +372,6 @@ Which we use to find the use the following estimator for the covariance
 $$
 \hat{\boldsymbol{\Sigma}}= \sum_{k=1}^K \frac{n_k - 1}{n - K} \cdot \hat{\boldsymbol{\Sigma}}_k
 $$
-DO WE NEED MORE ABOUT WHAT f_k(x) IS???
 
 ## e)
 
