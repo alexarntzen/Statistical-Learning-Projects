@@ -534,10 +534,6 @@ However, in order to get a result that is not dependent on only one sample, we c
 First of all, the performance differences between the methods are not that great, but we see that QDA has a somewhat weaker specificity, which means it is weaker at separating the "negatives", meaning the cases where player 1 lost the match. This could imply that the best model for 'ACEdiff' and 'UFEdiff' is linear, not quadratic as shown in Figure 3. It also seems reasonable that the descision boundary should increase on the whole domain, but in Figure 3 we observe a decreasing slope for $\text{ACEdiff}<  -5$. This means that when player 2 has a relative lead of 5 aces or more, player 1 is suddenly "allowed" to have a relative larger number of unforced errors, for the match to be a likely win for player 1. This does not make intuitive sense.
 
 
-```{r, eval=TRUE, echo=TRUE}
-UFEdiff = UFE1 - UFE2
-ACEdiff = ACE1 - ACE2
-```
 
 Hence we would prefer to use glm or LDA. However, as LDA has a slightly better probability of classifying the matches where player 1 won, it could be preferable if we care more about predicting wins than losses.
 
