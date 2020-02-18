@@ -352,13 +352,13 @@ $$
 First of all we have $\pi_k = P(Y = k)$ which is called the *prior probability*. In our case $\pi_1$ is the probability for player 1 winning any match, and $\pi_0$ is the probability for loss. Given a data set, as we have from `tennis`, we estimate by dividing total number of wins $n_w$ by total number of losses $n_l$ by player 1:  
 
 $$
-\hat{\pi} = \dfrac{n_w}{n_l}
+\hat{\pi_1} = \dfrac{n_w}{n_l}
 $$
 
 $\mu_k$ is the expectation of the covariate $x$ for the different classes. In our case $x$ is a multivariate random vector with two random variables $x = [x_1,x_2]^T$. $x_1$ represents `ACEdiff` and $x_2$ `UFEdiff`. $\mu_1$ is the expecation of $x$ given $Y = 1$, meaning player 1 won the match, $\text{E}[x|Y = 1]$, in the same way $\mu_0$ is the expecation of $x$ in the cases where player 1 lost the match, $\text{E}[x|Y = 0]$. $\mu_k$ is estimated by
 
 $$
-\hat{\boldsymbol{\mu}}_k = \frac{1}{n_k}\sum_{i:y_i=k} {\bf X}_i
+\hat{\boldsymbol{\mu}}_1 = \frac{1}{n_w}\sum_{i:y_i=1} {\bf X}_i
 $$
 
 $\Sigma$ is the covariance matrix for $x$, or for `ACEdiff` and `UFEdiff`, our random variables in this case. With a given data set we have the covariance matrix for class $k$:
@@ -372,6 +372,8 @@ Which we use to find the use the following estimator for the covariance
 $$
 \hat{\boldsymbol{\Sigma}}= \sum_{k=1}^K \frac{n_k - 1}{n - K} \cdot \hat{\boldsymbol{\Sigma}}_k
 $$
+
+Finally we have the class conditional distributions $f_k(\boldsymbol x) =\text{P}(\boldsymbol X =\boldsymbol x|Y = k)$. These are in the case of LDA and QDA assumed to be normal. This is the distribution of all $x$ that belongs to class $k$. Again, for the tennis problem $f_0(\boldsymbol x)$ gives the distribution for the bivariate variable $\boldsymbol x = [\text{ACEdiff,UFEdiff}]^T$ in the case where player 1 lost, and $f_1(\boldsymbol x)$ in the case where player 1 won. 
 
 ## e)
 
