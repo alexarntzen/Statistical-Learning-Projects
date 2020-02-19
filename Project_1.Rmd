@@ -1,16 +1,17 @@
 ---
-subtitle: "TMA4268 Statistical Learning V2019"
-title: "Compulsory exercise 1: Group 12"
+title: 'Compulsory exercise 1: Group 12'
 author: "Emma Skarnes, Håkon Noren  and Alexander Johan Arntzen"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: 
-  html_document
-  #pdf_document
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+subtitle: TMA4268 Statistical Learning V2019
 ---
   
 ```{r setup, include=FALSE}
 library(knitr)
-knitr::opts_chunk$set(echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
+knitr::opts_chunk$set(eval = TRUE, echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
                       cache=TRUE, size="scriptsize",fig.width=4, fig.height=3)
 
 ```
@@ -31,7 +32,6 @@ library(dplyr)
 library(boot)
 library(Rfast)
 theme_set(theme_bw())
-
 ```
 
 
@@ -42,16 +42,21 @@ For this problem you will need to include some LaTex code. Please install latex 
 ## a)
 The expected test mean squared error (MSE) at $x_{0}$ is 
 $$
+<<<<<<< HEAD
 \begin{equation}
   E[y_{0} -\hat{f}(x_{0}) ]^{2}.
   \label{eq1}
   \tag{1}
 \end{equation}
+=======
+ E[y_{0} -\hat{f}(x_{0}) ]^{2}.
+>>>>>>> alexbranch
 $$
 
 Where $y_{0}$ is the new observation.
 ## b)
 
+<<<<<<< HEAD
 Firstly, from computation it is clear that 
 $$
 \begin{equation}
@@ -67,34 +72,57 @@ $$
 \end{equation}
 $$
 Secondly note that $y_0$ and the training data are independent. In addition $\mathrm{E}[ \epsilon ] \ =\ 0 $. Then expanding equation $\eqref{eq1}$ and using equation $\eqref{eq2}$ the decomposition becomes 
+=======
+Firstly we from computation it is clear that 
+\[
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\E}{\mathrm{E}}
+\]
 
 $$
-\begin{align}
+\begin{aligned}
+\E[ f( x_{0}) -\hat{f}( x_{0})]^{2} & =\E[ f( x_{0}) -\E[\hat{f}( x_{0})] +\E[\hat{f}( x_{0})] -\hat{f}( x_{0})]^{2} \\
+ & =\E[ f( x_{0}) -\E[\hat{f}( x_{0})]]^{2} +2\E[ f( x_{0}) -\E[\hat{f}( x_{0})] \ ][ \E[\hat{f}( x_{0})] -\hat{f}( x_{0})] +\E[ \E[\hat{f}( x_{0})] -\hat{f}( x_{0})]^{2} \\
+ & =( f( x_{0}) -\E[\hat{f}( x_{0})])^{2} \  + \Var[ \hat{f}( x_{0})].
+\end{aligned}
+$$
+>>>>>>> alexbranch
+
+Secondly note that $y_0$ and the training data are independent. In addition $\mathrm{E}[ \epsilon ] \ =\ 0 $ Then expanding equation $\ref{eq:1.1}$ and using equation $\ref{eq:1.2}$ the decomposition becomes 
+$$
+\begin{aligned}
 \E[ y_{0} -\hat{f}( x_{0})]^{2} & \ =\E[ f( x_{0}) +\epsilon -\hat{f}( x_{0})]^{2}\\
  & =\E[ \epsilon - \E[ \epsilon ]]^{2} +2\E[ \epsilon ] \E[ f( x_{0}) -\hat{f}( x_{0})] +\E[ f( x_{0}) -\hat{f}( x_{0})]^{2} \ \\
- & =\Var[ \epsilon ] + [ f( x_{0}) - \E[\hat{f}( x_{0})]]^{2}   + \Var[ f( x_{0})].
-\end{align}
+ & =\Var[ \epsilon ] + [ f( x_{0}) - \E[\hat{f}( x_{0})]]^{2}   + \Var[ \hat{f}( x_{0})].
+\end{aligned}
 $$
 ## c)
 Since variance and squared expression cannot be negative each of the three terms contributes to the expected test MSE at $x_0$. The
 
 $\pmb{\Var[ \epsilon ]}$ is the **irreducible error**. It is independent of the model and cannot be reduced. 
 
+$\pmb{\Var[ \hat{f}( x_{0})]}$ is the **variance** of the prediction at $x_{0}. It is a measure of how much the model will change based on different training data. In general the variance of the model increases when the the flexibility of the model increases. 
 
+<<<<<<< HEAD
 $\pmb{\Var[ f( x_{0})]}$ is the **variance** of the prediction at $x_{0}$. It is a measure of how much the model will change based on different training data. In general the variance of the model decreases with the flexibility of the model. x
 
 $[ f( x_{0}) - \E[\hat{f}( x_{0})]]^{2}$ is the **squared bias** at $x_{0}$, also denoted $\mathrm{Bias}(\hat{f}( x_{0}))^{2}$. It is a measure of much the model differs from the target function $f$ at $x_{0}$. In general a flexible model will have low bias. For example
+=======
+$[ f( x_{0}) - \E[\hat{f}( x_{0})]]^{2}$ is the **squared bias** at $x_{0}$, also denoted $\mathrm{Bias}(\hat{f}( x_{0}))]^{2}$. It is a measure of much the model differs from the target function $f$ at $x_{0}$. In general a flexible model will have low bias. 
+>>>>>>> alexbranch
 
+A good model will strike a balance between bias and variance to achieve a low total expected test MSE.
 
-A good model will strike a balance between bias and variance to achieve a low total expected test MSE. 
 ## d)
 TRUE, FALSE, FALSE, TRUE
-% Litt usikker her noen burde sjekke. 
+% Litt usikker her noen burde sjekke.
+
 ## e)
 TRUE, FALSE, TRUE, FALSE. 
 
 ## f)
 (ii)
+
 ## g)
 C
 
@@ -608,7 +636,7 @@ $$
 TRUE, TRUE, TRUE, FALSE 
 
 ## c)
-```{r, eval=FALSE, echo=TRUE}
+```{r }
 
  id <- "1I6dk1fA4ujBjZPo3Xj8pIfnzIa94WKcy" # google file ID
 d_chd <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",
@@ -637,15 +665,16 @@ testPlotFemale
 
 testPlotMale 
 ```
+<<<<<<< HEAD
 The probability of chd for a male with a sbp=140 is .
+=======
+The probability of coronary heart disease for a male with a blood pressure 140 is `r chdProbability`.
+>>>>>>> alexbranch
 
 
 ## d)
 
-```{r, eval=FALSE, echo=TRUE}
-
-library(dplyr)
-library(boot)
+```{r }
 
 eval_f_hat <- function(sbp,sex){
   return(
@@ -676,12 +705,15 @@ ggplot(data = data.frame(x=bootProbs$t),aes(x=x))+   geom_density() + geom_densi
 
 low = Rfast::nth(probs, 26, descending = FALSE)
 high = Rfast::nth(probs, 26, descending = TRUE)
-
-
 ```
+<<<<<<< HEAD
 From the probabilies we get a standard error of r stdError.A $95\%$ confidence interval for the the estimator of $P(\mathrm{chd} | \mathrm{sex= male},\mathrm{sbp=40})$ is [ `
 r low ,r high]. 
 If we assume the estimated distribution to be true it means that the estimator will take values in [ r low ,r high]  $95\%$ of the time. This indicates that the estimator has a high variance, but we don't know if it has low or high bias. 
+=======
+from the probabilies we get a standard error of r stdError.A $95\%$ confidence interval for the the estimator of $P(\mathrm{chd} | \mathrm{sex= male},\mathrm{sbp=40})$ is [`r low ` ,`r high`]. 
+If we assume the estimated distribution to be true it means that the estimator will take values in [`r low` ,`r high`]  $95\%$ of the time. This indicates that the estimator has a high variance, but we don't know if it has low or high bias. 
+>>>>>>> alexbranch
 
 
 
