@@ -166,8 +166,8 @@ fit.lmInter = lm(log(GEWICHT) ~ log(MAGENUMF) * Gattung, data = d.worm)
 summary(fit.lmInter)
 anova(fit.lmInter,fit.lm)
 ```
-Comment on whether the interaction term is relevant or not ++
-Here, the p-value of the interaction terms are also relatively far away from zero, and the F-statistic from the anova table is close to 1, both of which supports our results from $\textbf{2c)}$. In other words, an interaction term between the logarithm of the circumference and the species does not improve the model.
+
+Here, the p-value  are also relatively far away from zero, and the F-statistic from the anova table is close to 1, both of which supports our results from $\textbf{2c)}$. In other words, an interaction term between the logarithm of the circumference and the species does not improve the model.
 
 ## e)
 ```{r,eval=TRUE, echo=TRUE}
