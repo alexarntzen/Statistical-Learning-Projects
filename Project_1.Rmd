@@ -70,7 +70,9 @@ $$
 $$
 
 ## c)
-Since variance and squared expression cannot be negative each of the three terms contributes to the expected test MSE at $x_0$. The $\pmb{\mathrm{Var}[ \epsilon ]}$ is the **irreducible error**. It is independent of the model and cannot be reduced. 
+Since variance and squared expression cannot be negative each of the three terms contributes to the expected test MSE at $x_0$.
+
+The $\pmb{\mathrm{Var}[ \epsilon ]}$ is the **irreducible error**. It is independent of the model and cannot be reduced. 
 
 $\pmb{\mathrm{Var}[ \hat{f}( x_{0})]}$ is the **variance** of the prediction at $x_{0}$. It is a measure of how much the model will change based on different training data. In general the variance of the model increases when the the flexibility of the model increases. 
 
