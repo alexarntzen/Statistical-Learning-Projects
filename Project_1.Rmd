@@ -76,7 +76,7 @@ The $\pmb{\mathrm{Var}[ \epsilon ]}$ is the **irreducible error**. It is indepen
 
 $\pmb{\mathrm{Var}[ \hat{f}( x_{0})]}$ is the **variance** of the prediction at $x_{0}$. It is a measure of how much the model will change based on different training data. In general the variance of the model increases when the the flexibility of the model increases. 
 
-$[ f( x_{0}) - \mathrm{E}[\hat{f}( x_{0})]]^{2}$ is the **squared bias** at $x_{0}$, also denoted $\mathrm{Bias}(\hat{f}( x_{0}))^{2}$. It is a measure of how much the model differs from the target function $f$ at $x_{0}$. In general a flexible model will have low bias. 
+$\pmb{[ f( x_{0}) - \mathrm{E}[\hat{f}( x_{0})]]^{2}}$ is the **squared bias** at $x_{0}$, also denoted $\mathrm{Bias}(\hat{f}( x_{0}))^{2}$. It is a measure of how much the model differs from the target function $f$ at $x_{0}$. In general a flexible model will have low bias. 
 
 A good model will strike a balance between bias and variance to achieve a low total expected test MSE.
 
