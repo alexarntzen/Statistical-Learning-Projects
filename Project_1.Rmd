@@ -198,16 +198,13 @@ FALSE, FALSE, FALSE, TRUE.
 
 # Problem 3
 
-In this problem, we will use a dataset from the Wimbledon tennis tournament for Women in 2013. We will predict the result for player 1 (win=1 or loose=0) based on the number of aces won by each player and the number of unforced errors commited by both players. The data set is a subset of a data set from https://archive.ics.uci.edu/ml/datasets/Tennis+Major+Tournament+Match+Statistics, see that page for information of the source of the data.
-
-The files can be read using the following code.
+In this problem, we will use a dataset from the Wimbledon tennis tournament andpredict the result for player 1 (win=1 or loose=0) based on data from the match.
 
 ```{r,eval=TRUE,echo=FALSE}
 # read file
 id <- "1GNbIhjdhuwPOBr0Qz82JMkdjUVBuSoZd"
 tennis <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", 
     id), header = T)
-summary(tennis)
 ```
 
 ## a)
@@ -257,13 +254,13 @@ $$
 \end{aligned}
 $$
 
-Hence we see that the odds will increase with a factor of $\beta_1$  if player 1 has one more ace, $x_{i1}' = x_{i1} + 1$. As $\beta_1 = 0.36338$ we know that one more ace for player 1 will increase the likelihood for player 1 winning the match with a factor of $e^{0.36338} \approx 1.438$, in our model.
+Hence we see that the odds will increase with a factor of $e^{\beta_1}$  if player 1 has one more ace, $x_{i1}' = x_{i1} + 1$. As $\beta_1 = 0.36338$ we know that one more ace for player 1 will increase the likelihood for player 1 winning the match with a factor of $e^{0.36338} \approx 1.438$, in our model.
 
 
 ```{r,eval=TRUE,echo=FALSE} 
 # CHANGE echo TO TRUE, REF. PRACTICAL ISSUES IN THE PROBLEM TEXT?
 r.tennis = glm(Result ~ ACE.1 + ACE.2 + UFE.1 + UFE.2, data = tennis, family = "binomial")
-summary(r.tennis)
+summary(r.tennis)$coefficients
 ```
 
 ## c)
@@ -344,7 +341,7 @@ $$
 P(Y=k | {\bf X}={\boldsymbol x}) = \frac{\pi_k f_k({\boldsymbol x})}{\sum_{l=1}^K \pi_l f_l({\boldsymbol x})}
 $$
 
-First of all we have $\pi_k = P(Y = k)$ which is called the *prior probability*. In our case $\pi_1$ is the probability for player 1 winning any match, and $\pi_0$ is the probability for loss. Given a data set, as we have from `tennis`, we estimate by dividing total number of wins $n_w$ by total number of losses $n_l$ by player 1:  
+First of all we have $\pi_k = P(Y = k)$ which is called the *prior probability*. In our case $\pi_1$ is the probability for player 1 winning any match, and $\pi_0$ is the probability for loss. Given a data set, as we have from `tennis`, we estimate $\hat\pi_1$ by dividing total number of wins $n_w$ by total number of losses $n_l$ by player 1:  
 
 $$
 \hat{\pi_1} = \dfrac{n_w}{n_l}
@@ -430,20 +427,20 @@ $$
 By defining 
 
 $$
-[\alpha_1,\alpha_2] = \boldsymbol{\Sigma}^{-1}(\boldsymbol\mu_0 -\boldsymbol\mu_1)
+[\alpha_1,\alpha_2]^T = \boldsymbol{\Sigma}^{-1}(\boldsymbol\mu_0 -\boldsymbol\mu_1)
 $$
 
 we get 
 
 $$
-[x_1,x_2]^T[\alpha_1,\alpha_2] = x_1\alpha_1 + x_2\alpha_2
+[x_1,x_2][\alpha_1,\alpha_2]^T = x_1\alpha_1 + x_2\alpha_2
 $$
 
 and finally we have
 
 $$
 x_2 
-= x_1\frac{\alpha_1}{\alpha_2} + \frac{1}{2\alpha_2}
+= -x_1\frac{\alpha_1}{\alpha_2} + \frac{1}{2\alpha_2}
 (\boldsymbol\mu_0^T \boldsymbol{\Sigma}^{-1}\boldsymbol\mu_0 
 -\boldsymbol\mu_1^T \boldsymbol{\Sigma}^{-1}\boldsymbol\mu_1 -2\log\dfrac{ \pi_0}{ \pi_1})
 $$
@@ -480,7 +477,7 @@ plot
 
 
 ## f)
-```{r, eval=TRUE, echo=TRUE}
+```{r, eval=TRUE, echo=FALSE}
 r.tennisLDA = lda(Result ~ ACEdiff + UFEdiff, data = tennisTrain)
 tennisLDAPred = predict(r.tennisLDA, tennisTest)$class
 
@@ -499,7 +496,9 @@ When we derived the decision boundary for LDA we assumed that each class have eq
 ```{r, eval=TRUE, echo=TRUE}
 r.tennisQDA = qda(Result ~ ACEdiff + UFEdiff, data = tennisTrain)
 tennisQDAPred = predict(r.tennisQDA, tennisTest)$class
+```
 
+```{r, eval=TRUE, echo=FALSE}
 tennisQDACM = table(real = tennisTest$Result, predicted = tennisQDAPred)
 tennisQDACM
 
@@ -534,7 +533,7 @@ First of all, the performance differences between the methods are not that great
 Hence we would prefer to use glm or LDA. However, as LDA has a slightly better probability of classifying the matches where player 1 won, it could be preferable if we care more about predicting wins than losses.
 
 
-```{r,eval=TRUE,echo=TRUE}
+```{r,eval=TRUE,echo=FALSE}
 tennis_classification = function(runs) {
     res = matrix(0L,nrow=3,ncol=2)
     
