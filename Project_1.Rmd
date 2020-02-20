@@ -31,6 +31,7 @@ library(MASS)
 library(dplyr)
 library(boot)
 library(Rfast)
+library(formatR)
 theme_set(theme_bw())
 ```
 
@@ -46,39 +47,36 @@ $$
 $$
 
 Where $y_{0}$ is the new observation.
+
 ## b)
 
-
-Firstly we from computation it is clear that 
-$$
-\newcommand{\Var}{\mathrm{Var}}
-\newcommand{\E}{\mathrm{E}}
-$$
+Firstly, from computation it is clear that 
 
 $$
 \begin{aligned}
-\E[ f( x_{0}) -\hat{f}( x_{0})]^{2} & =\E[ f( x_{0}) -\E[\hat{f}( x_{0})] +\E[\hat{f}( x_{0})] -\hat{f}( x_{0})]^{2} \\
- & =\E[ f( x_{0}) -\E[\hat{f}( x_{0})]]^{2} +2\E[ f( x_{0}) -\E[\hat{f}( x_{0})] \ ][ \E[\hat{f}( x_{0})] -\hat{f}( x_{0})] +\E[ \E[\hat{f}( x_{0})] -\hat{f}( x_{0})]^{2} \\
- & =( f( x_{0}) -\E[\hat{f}( x_{0})])^{2} \  + \Var[ \hat{f}( x_{0})].
+\mathrm{E}[ f( x_{0}) -\hat{f}( x_{0})]^{2} & =\mathrm{E}[ f( x_{0}) -\mathrm{E}[\hat{f}( x_{0})] +\mathrm{E}[\hat{f}( x_{0})] -\hat{f}( x_{0})]^{2} \\
+ & =\mathrm{E}[ f( x_{0}) -\mathrm{E}[\hat{f}( x_{0})]]^{2} +2\mathrm{E}[ f( x_{0}) -\mathrm{E}[\hat{f}( x_{0})] \ ][ \mathrm{E}[\hat{f}( x_{0})] -\hat{f}( x_{0})] +\mathrm{E}[ \mathrm{E}[\hat{f}( x_{0})] -\hat{f}( x_{0})]^{2} \\
+ & =( f( x_{0}) -\mathrm{E}[\hat{f}( x_{0})])^{2} \  + \mathrm{Var}[ \hat{f}( x_{0})].
 \end{aligned}
 $$
 
-Secondly note that $y_0$ and the training data are independent. In addition $\mathrm{E}[ \epsilon ] \ =\ 0 $ Then expanding equation $\ref{eq:1.1}$ and using equation $\ref{eq:1.2}$ the decomposition becomes 
+Secondly note that $y_0$ and the training data are independent. In addition $\mathrm{E[\epsilon]}=0$. Then, expanding the test~MSE, the decomposition becomes 
 $$
 \begin{aligned}
-\E[ y_{0} -\hat{f}( x_{0})]^{2} & \ =\E[ f( x_{0}) +\epsilon -\hat{f}( x_{0})]^{2}\\
- & =\E[ \epsilon - \E[ \epsilon ]]^{2} +2\E[ \epsilon ] \E[ f( x_{0}) -\hat{f}( x_{0})] +\E[ f( x_{0}) -\hat{f}( x_{0})]^{2} \ \\
- & =\Var[ \epsilon ] + [ f( x_{0}) - \E[\hat{f}( x_{0})]]^{2}   + \Var[ \hat{f}( x_{0})].
+\mathrm{E}[ y_{0} -\hat{f}( x_{0})]^{2} & \ =\mathrm{E}[ f( x_{0}) +\epsilon -\hat{f}( x_{0})]^{2}\\
+ & =\mathrm{E}[ \epsilon - \mathrm{E}[ \epsilon ]]^{2} +2\mathrm{E}[ \epsilon ] \mathrm{E}[ f( x_{0}) -\hat{f}( x_{0})] +\mathrm{E}[ f( x_{0}) -\hat{f}( x_{0})]^{2} \ \\
+ & =\mathrm{Var}[ \epsilon ] + [ f( x_{0}) - \mathrm{E}[\hat{f}( x_{0})]]^{2}   + \mathrm{Var}[ \hat{f}( x_{0})].
 \end{aligned}
 $$
+
 ## c)
-Since variance and squared expression cannot be negative each of the three terms contributes to the expected test MSE at $x_0$. The
+Since variance and squared expression cannot be negative each of the three terms contributes to the expected test MSE at $x_0$.
 
-$\pmb{\Var[ \epsilon ]}$ is the **irreducible error**. It is independent of the model and cannot be reduced. 
+The $\pmb{\mathrm{Var}[ \epsilon ]}$ is the **irreducible error**. It is independent of the model and cannot be reduced. 
 
-$\pmb{\Var[ \hat{f}( x_{0})]}$ is the **variance** of the prediction at $x_{0}. It is a measure of how much the model will change based on different training data. In general the variance of the model increases when the the flexibility of the model increases. 
+$\pmb{\mathrm{Var}[ \hat{f}( x_{0})]}$ is the **variance** of the prediction at $x_{0}$. It is a measure of how much the model will change based on different training data. In general the variance of the model increases when the the flexibility of the model increases. 
 
-$[ f( x_{0}) - \E[\hat{f}( x_{0})]]^{2}$ is the **squared bias** at $x_{0}$, also denoted $\mathrm{Bias}(\hat{f}( x_{0}))]^{2}$. It is a measure of much the model differs from the target function $f$ at $x_{0}$. In general a flexible model will have low bias. 
+$[ f( x_{0}) - \mathrm{E}[\hat{f}( x_{0})]]^{2}$ is the **squared bias** at $x_{0}$, also denoted $\mathrm{Bias}(\hat{f}( x_{0}))^{2}$. It is a measure of how much the model differs from the target function $f$ at $x_{0}$. In general a flexible model will have low bias. 
 
 A good model will strike a balance between bias and variance to achieve a low total expected test MSE.
 
@@ -103,19 +101,20 @@ head(d.worm)
 
 
 ## a)
-The dataset consists of 143 rows and 5 columns, which can be seen from running the $str()$-function.
-The qualitative variables are Gattung, FANGDATUM and Nummer, while the quantitative variables are GEWICHT and MAGENUMF.
-
+The dataset consists of 143 rows and 5 columns, which can be seen from the `str()`-function.
+The qualitative variables are Gattung and Nummer, while the quantitative variables are GEWICHT, FANGDATUM and MAGENUMF.
 
 ## b) 
 ```{r, eval=TRUE, echo=TRUE, fig.width=4, fig.height=3}
 ggplot(d.worm, aes(x = MAGENUMF, y = GEWICHT, colour = Gattung)) + geom_point() + theme_bw()
 ```
+
 The relationship in this scatterplot does not look linear, so we linearize it by transforming the quantitative variables. Here, we take the logarithm of both:
 ```{r, eval=TRUE, echo=TRUE}
 ggplot(d.worm, aes(x = log(MAGENUMF), y = log(GEWICHT), colour = Gattung)) + geom_point() + theme_bw()
 ```
-The relationship now looks quite linear, which can be seen more clearly by adding $+ geom\_smooth(method = "lm")$ to the $ggplot()$-function. Especially the species denoted by $L$ and $Oc$ are close to the fitted line, while there is a bigger spread for the species denoted by $N$.
+
+The relationship now looks quite linear, which can be seen more clearly by adding `+ geom\_smooth(method = "lm")` to the `ggplot()`-function. Especially the species denoted by $L$ and $Oc$ are close to the fitted line, while there is a bigger spread for the species denoted by $N$.
 
 ## c)
 ```{r, eval=TRUE, echo=TRUE}
@@ -132,38 +131,31 @@ $$
 where $x_{i1}$ and $x_{i2}$ are the dummy variables, given by
 
 $$
-\begin{equation}
-  x_{i1} = \Bigg{\{} 
-  \begin{split} 
+  x_{i1} =  
+  \begin{cases} 
     1 &\quad \text{if the ith worm is a Nicodrilus} \\
     0 &\quad \text{if the ith worm is not a Nicodrilus}
-  \end{split}
-\end{equation}
+  \end{cases}
 $$
 $$
-\begin{equation}
-  x_{i2} = \Bigg{\{} 
-  \begin{split} 
+  x_{i2} =  
+  \begin{cases} 
     1 &\quad \text{if the ith worm is an Octolasion} \\
     0 &\quad \text{if the ith worm is not an Octolasion}
-  \end{split}
-\end{equation}
+  \end{cases}
 $$
 
 This gives the following equations:
-$$
-\begin{equation}
-  \text{log(GEWICHT)} = \Bigg{\{} 
-  \begin{split} 
-    -3.13865 &+ 2.59310 \cdot \text{log(MAGENUMF)} + 0.24106 &\quad \text{if Gattung="L"} \\
-    -3.13865 &+ 2.59310 \cdot \text{log(MAGENUMF)} + 0.07327 + 0.24106  &\quad \text{if Gattung="N"} \\
-    -3.13865 &+ 2.59310 \cdot \text{log(MAGENUMF)} - 0.06149 + 0.24106  &\quad \text{if Gattung="Oc"}
-  \end{split}
-\end{equation}
 
-% Er det riktig å ta med feilleddet på slutten ( +0.24106)?
 $$
-By looking at the outputs of the $summary()$ and $anova()$ functions, we observe that the p-values for the species are relatively high in the summary, which indicates that there is no statistical evidence of a difference between the average weight of the three species - even though it might look like that from our plots. The anova output has an F-statistic of 0.8441 and associated p-value of 0.4321, which indicates that Gattung is not a relevant predictor.
+  \text{log(GEWICHT)} = 
+  \begin{cases} 
+    -3.13865 + 2.59310 \cdot \text{log(MAGENUMF)} + 0.24106 &\quad \text{if Gattung="L"} \\
+    -3.13865 + 2.59310 \cdot \text{log(MAGENUMF)} + 0.07327 + 0.24106  &\quad \text{if Gattung="N"} \\
+    -3.13865 + 2.59310 \cdot \text{log(MAGENUMF)} - 0.06149 + 0.24106  &\quad \text{if Gattung="Oc"}
+  \end{cases}
+$$
+By looking at the outputs of the `summary()` and `anova()` functions, we observe that the p-values for the species are relatively high in the summary, which indicates that there is no statistical evidence of a difference between the average weight of the three species - even though it might look like that from our plots. The anova output has an F-statistic of 0.8441 and associated p-value of 0.4321, which indicates that Gattung is not a relevant predictor.
 
 
 
@@ -172,10 +164,10 @@ By looking at the outputs of the $summary()$ and $anova()$ functions, we observe
 # Test interaction term
 fit.lmInter = lm(log(GEWICHT) ~ log(MAGENUMF) * Gattung, data = d.worm)
 summary(fit.lmInter)
-anova(fit.lmInter)
+anova(fit.lmInter,fit.lm)
 ```
-Comment on whether the interaction term is relevant or not ++
-Here, the p-value of the interaction terms are also relatively far away from zero, and the F-statistic from the anova table is close to 1, both of which supports our results from $\textbf{2c)}$. In other words, an interaction term between the logarithm of the circumference and the species does not improve the model.
+
+Here, the p-value  are also relatively far away from zero, and the F-statistic from the anova table is close to 1, both of which supports our results from $\textbf{2c)}$. In other words, an interaction term between the logarithm of the circumference and the species does not improve the model.
 
 ## e)
 ```{r,eval=TRUE, echo=TRUE}
@@ -186,13 +178,14 @@ The Residuals vs. fitted plot, or Tukey-Anscombe, seems to be nonlinear, which i
 We have some outliers in the QQ-plot, especially points 7, 96 and 2. However, the majority of the points are making up a fairly straight line, so some outliers does not imply that our assumptions are violated. 
 In the Scale-Location plot, the points seems to gather a little bit as the fitted values increase. This can be a sign of non-equal variances, which is violating our assumptions. 
 In the Constant Leverage: Residuals vs Factor Levels plot, we can see that the spread of the points seems to differ based on the species. While there is only one obvious outlier for the Lumbricus species, there are more outliers for the two other species, even though these are not as far from the majority as the outlier in L. Also, note that the same observations from the QQ-plot seems to be the problematic ones.
-<font color = red> Riktig konklusjon? </font>
+
 
 ```{r, eval=TRUE, echo=TRUE}
 # Compare to the model without transformed variables 
 fit.lm1 = lm(GEWICHT ~ MAGENUMF + Gattung, data = d.worm)
 autoplot(fit.lm1, smooth.colour = NA)
 ```
+
 Comparing our model with transformed variables to the model without any transformations, we can clearly see that the latter one is violating the assumptions more. There seems to be a trend in the Tukey-Anscombe plot, and the points are not following the line quite as well in the QQ-plot. However, the Scale-Location plot does not behave as in our transformed model - here the points are fairly well distributed. We do have some outliers and problematic observations in the Leverage plot, but they are in general more gathered here than in the model we have used.
 
 ## f)
@@ -201,7 +194,6 @@ In case of violated assumptions, we can for instance remove the outliers and fit
 
 ## g)
 FALSE, FALSE, FALSE, TRUE.
-<font color = red>SJEKK DENNE!!</font>
 
 
 # Problem 3
@@ -265,7 +257,7 @@ $$
 \end{aligned}
 $$
 
-Hence we see that the odds will increase with a factor of $\beta_1$  if player 1 has one more ace, $x_{i1}' = x_{i1} + 1 $. As $\beta_1 = 0.36338$ we know that one more ace for player 1 will increase the likelihood for player 1 winning the match with a factor of $e^{0.36338} \approx 1.438$, in our model.
+Hence we see that the odds will increase with a factor of $\beta_1$  if player 1 has one more ace, $x_{i1}' = x_{i1} + 1$. As $\beta_1 = 0.36338$ we know that one more ace for player 1 will increase the likelihood for player 1 winning the match with a factor of $e^{0.36338} \approx 1.438$, in our model.
 
 
 ```{r,eval=TRUE,echo=FALSE} 
@@ -426,7 +418,6 @@ $$
 
 We will now derive the class boundary by using the expression we have derived above. As we know that
 $$
-
 P(Y=0 | {\bf X}={\boldsymbol x}) = P(Y=1 | {\bf X}={\boldsymbol x}) = 0.5
 $$
 
@@ -536,7 +527,7 @@ However, in order to get a result that is not dependent on only one sample, we c
 |LDA|0.79|0.67|1.46|
 |QDA|0.79|0.65|1.43|
 
-First of all, the performance differences between the methods are not that great, but we see that QDA has a somewhat weaker specificity, which means it is weaker at separating the "negatives", meaning the cases where player 1 lost the match. This could imply that the best model for 'ACEdiff' and 'UFEdiff' is linear, not quadratic as shown in Figure 3. It also seems reasonable that the descision boundary should increase on the whole domain, but in Figure 3 we observe a decreasing slope for $\text{ACEdiff}<  -5$. This means that when player 2 has a relative lead of 5 aces or more, player 1 is suddenly "allowed" to have a relative larger number of unforced errors, for the match to be a likely win for player 1. This does not make intuitive sense.
+First of all, the performance differences between the methods are not that great, but we see that QDA has a somewhat weaker specificity, which means it is weaker at separating the "negatives", meaning the cases where player 1 lost the match. This could imply that the best model for `ACEdiff` and `UFEdiff` is linear, not quadratic as shown in Figure 3. It also seems reasonable that the descision boundary should increase on the whole domain, but in Figure 3 we observe a decreasing slope for $\text{ACEdiff}<  -5$. This means that when player 2 has a relative lead of 5 aces or more, player 1 is suddenly "allowed" to have a relative larger number of unforced errors, for the match to be a likely win for player 1. This does not make intuitive sense.
 
 
 
@@ -592,9 +583,9 @@ res
 
 # Problem 4
 ## a)
-10 fold cross validation on the KNN regression would be performed by partitioning the training data $D$ into 10 equal size sets $D_i$. For each of the 10 sets, leave the set out form the data and calculate a test error using the set as test data. Then average the test errors for all the 10 sets. More precisely we would use test MSE as error measure. let $\mathcal{N_i(x)}$ be the $K$ closest point in $D \setminus	D_i$ to $x$. The test MSE is calculated as 
+10 fold cross validation on the KNN regression would be performed by partitioning the training data $D$ into 10 equal size sets $D_i$. For each of the 10 sets, leave the set out form the data and calculate a test error using the set as test data. Then average the test errors for all the 10 sets. More precisely we would use test MSE as error measure. Let $\mathcal{N}_i (x)$ be the $K$ closest points in $D \setminus	D_i$ to $x$. The test MSE is calculated as 
 $$
-\mathrm{MSE}_{i}=\frac{1}{|D_i|}\sum^{|D_i|}_{j=1}{(y_j-\frac{1}{K}\sum_{l\in \mathcal{N_i(x_j)}}{y_l} )^2 },
+\mathrm{MSE}_{i}=\frac{1}{|D_i|}\sum^{|D_i|}_{j=1}{(y_j-\frac{1}{K}\sum_{l\in \mathcal{N}_i(x_j)}{y_l} )^2 },
 $$
 where $y_j,y_j \in D_i$ and $y_l$ is the observed response at $l$. The validation error is then calculated as 
 
@@ -607,12 +598,9 @@ TRUE, TRUE, TRUE, FALSE
 
 ## c)
 ```{r }
-
  id <- "1I6dk1fA4ujBjZPo3Xj8pIfnzIa94WKcy" # google file ID
 d_chd <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",
 id))
-
-
 get_f_hat <- function(chd_data){
   logitRegChd <- glm(chd~sbp+sex, data=chd_data, family="binomial")
   b <- coef(logitRegChd)[1]
@@ -624,16 +612,12 @@ get_f_hat <- function(chd_data){
   
  }
 f_hat <- get_f_hat(d_chd)
-
 chdProbability <- unname(f_hat(140,1))
 
-testPlotFemale <- ggplot(subset(d_chd, sex == 0), aes(x=subset(sbp, sex == 0), y=subset(chd, sex == 0)))+geom_point() + geom_line(aes(x=sbp, y=f_hat(sbp,1)), col="blue")
-
-testPlotMale <- ggplot(subset(d_chd, sex == 1), aes(x=subset(sbp, sex == 1), y=subset(chd, sex == 1)))+geom_point() + geom_line(aes(x=sbp, y=f_hat(sbp,2)), col="blue")
-
-testPlotFemale
-
-testPlotMale 
+#testPlotFemale <- ggplot(subset(d_chd, sex == 0), aes(x=subset(sbp, sex == 0), y=subset(chd, sex == 0)))+geom_point() + geom_line(aes(x=sbp, y=f_hat(sbp,1)), col="blue")
+#testPlotMale <- ggplot(subset(d_chd, sex == 1), aes(x=subset(sbp, sex == 1), y=subset(chd, sex == 1)))+geom_point() + geom_line(aes(x=sbp, y=f_hat(sbp,2)), col="blue")
+#testPlotFemale
+#testPlotMale 
 ```
 
 The probability of coronary heart disease for a male with a blood pressure 140 is `r chdProbability`.
@@ -650,8 +634,6 @@ eval_f_hat <- function(sbp,sex){
     }
   )
 }
-
-
 boostrap_stats <- function(data,stat_func, num_samples ){
   rows <- nrow(data)
   boostrap_stats <- numeric(num_samples)
@@ -662,21 +644,14 @@ boostrap_stats <- function(data,stat_func, num_samples ){
   return(boostrap_stats)
 } 
 probs <- boostrap_stats(d_chd,eval_f_hat(140,1),1000)
-bootProbs<-  boot(data = d_chd,statistic = eval_f_hat(140,1) , R = 1000)
+#bootProbs<-  boot(data = d_chd,statistic = eval_f_hat(140,1) , R = 1000)
 stdError = sd(probs)
-ggplot(data = data.frame(x=bootProbs$t),aes(x=x))+   geom_density() + geom_density(data = data.frame(x=probs),aes(x=x), color = "red")
-
+#ggplot(data = data.frame(x=bootProbs$t),aes(x=x))+   geom_density() + geom_density(data = data.frame(x=probs),aes(x=x), color = "red")
 #Confidence interval
-
 #Removing top 1000*(1-a/2) from each end 
-
 low = Rfast::nth(probs, 26, descending = FALSE)
 high = Rfast::nth(probs, 26, descending = TRUE)
 ```
 
-from the probabilies we get a standard error of r stdError.A $95\%$ confidence interval for the the estimator of $P(\mathrm{chd} | \mathrm{sex= male},\mathrm{sbp=40})$ is [`r low ` ,`r high`]. 
-If we assume the estimated distribution to be true it means that the estimator will take values in [`r low` ,`r high`]  $95\%$ of the time. That is, we estimate that the there is a 95% chance that males with blood pressure 140 has between`r low` to `r high` probability of having  coronary heart disease.This is quite high, and indicates that the estimator has a high variance, but we don't know if it has low or high bias. 
-
-
-
-
+From the probabilies we get a standard error of `r stdError`. A $95\%$ confidence interval for the the estimator of $P(\mathrm{chd} | \mathrm{sex= male},\mathrm{sbp=40})$ is [`r low `, `r high`]. 
+If we assume the estimated distribution to be true it means that the estimator will take values in [`r low` ,`r high`]  $95\%$ of the time. That is, we estimate that the there is a 95% chance that males with blood pressure 140 has between `r low` to `r high` probability of having  coronary heart disease. This is quite high, and indicates that the estimator has a high variance, but we don't know if it has low or high bias. 
