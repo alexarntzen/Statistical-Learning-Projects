@@ -198,7 +198,7 @@ FALSE, FALSE, FALSE, TRUE.
 
 # Problem 3
 
-In this problem, we will use a dataset from the Wimbledon tennis tournament andpredict the result for player 1 (win=1 or loose=0) based on data from the match.
+In this problem, we will use a dataset from the Wimbledon tennis tournament and predict the result for player 1 (win=1 or loose=0) based on data from the match.
 
 ```{r,eval=TRUE,echo=FALSE}
 # read file
@@ -250,7 +250,7 @@ We provide an interpretation of how the coefficients $\beta_i$ affect $p_i$ by l
 $$
 \begin{aligned}
 \frac{\text{odds}(Y_i=1 \mid X_{1} = x_{i1} + 1)}{\text{odds}(Y_i=1 \mid X_j = x_{ij})} &= \frac{e^{\beta_0 + \beta_1 (x_{i1} + 1) + \beta_2 x_{i2} + \beta_3x_{i3} + \beta_4 x_{i4}}}{e^{\beta_0 + \beta_1x_{i1} + \beta_2 x_{i2} + \beta_3x_{i3} + \beta_4 x_{i4}}} \\
-&= e^{\beta_11}
+&= e^{\beta_1}
 \end{aligned}
 $$
 
