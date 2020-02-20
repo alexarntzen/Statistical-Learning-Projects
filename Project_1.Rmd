@@ -583,7 +583,7 @@ res
 ## a)
 10 fold cross validation on the KNN regression would be performed by partitioning the training data $D$ into 10 equal size sets $D_i$. For each of the 10 sets, leave the set out form the data and calculate a test error using the set as test data. Then average the test errors for all the 10 sets. More precisely we would use test MSE as error measure. Let $\mathcal{N}_i (x)$ be the $K$ closest points in $D \setminus	D_i$ to $x$. The test MSE is calculated as 
 $$
-\mathrm{MSE}_{i}=\frac{1}{|D_i|}\sum^{|D_i|}_{j=1}{(y_j-\frac{1}{K}\sum_{l\in \mathcal{N}_i(x_j)}{y_l} )^2 },
+\mathrm{MSE}_{i}=\frac{1}{|D_i|}\sum^{|D_i|}_{j=1}{(y_j-\frac{1}{10}\sum_{l\in \mathcal{N}_i(x_j)}{y_l} )^2 },
 $$
 where $y_j,y_j \in D_i$ and $y_l$ is the observed response at $l$. The validation error is then calculated as 
 
