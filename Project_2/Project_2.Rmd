@@ -3,9 +3,9 @@ title: 'Compulsory exercise 2: Group 12'
 author: "Emma Skarnes, Håkon Noren  and Alexander Johan Arntzen"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
-  pdf_document: default
   html_document:
     df_print: paged
+  pdf_document: default
 subtitle: TMA4268 Statistical Learning V2020
 ---
   
@@ -45,6 +45,8 @@ library(formatR)
 library(e1071)
 library(corrplot)
 library(tree)
+library(randomForest)
+library(gbm)
 theme_set(theme_bw())
 ```
 
@@ -78,11 +80,169 @@ theme_set(theme_bw())
 
 ## a)
 
+1. False
+2. True
+3. True
+4. False
+
 ## b)
+
+We try to make models based on a regression tree, random forest and by using boosting. The aim is to predict the variable *Outstate* by using the other variables in the *College* dataset as predictors.
+
+In order to find a test MSE we make a test and training set, where we use $70%$ of the data for training and the rest for testing.
+
+``` {r, eval = TRUE, echo = FALSE}
+set.seed(1234)
+n = dim(College)[1]
+p = dim(College)[2]
+train = sample(1:n,0.7*n,replace = FALSE)
+college.train = College[train,]
+college.test = College[-train,]
+```
+
+We first try a regression tree and print the estimated standard deviation (root of the MSE). We also plot the estimated Outstate cost $\hat y$ against the Outstate cost for our testing dataset $y$, to get an idea of the model performance.
+
+``` {r, eval = TRUE, echo = TRUE}
+tree = tree(Outstate~.,data=college.train)
+yhat = predict(tree,newdata=college.test)
+y = college.test$Outstate
+MSE = mean((yhat-y)^2)
+print("The standard deviation when using a regression tree model is: ")
+sqrt(MSE)
+
+plot(yhat,y,pch=20)
+abline(a=0,b=1)
+```
+
+We do the same as above, only using a random forest model. On the plot below we observe how the random forest yields an estimate $\hat y$ that is no longer discrete as we saw for the regression tree. This follow from the fact that the random forest is an average of many different regression trees (as data is drawn by boostrapping), in our case $n_{tree} = 1000$.
+
+
+``` {r, eval = TRUE, echo = TRUE}
+rf = randomForest(Outstate~.,data=college.train,mtry=p-1,ntree=1000)
+yhat = predict(rf,newdata=college.test)
+y = college.test$Outstate
+MSE = mean((yhat-y)^2)
+
+print("The standard deviation when using a random forest model is: ")
+sqrt(MSE)
+
+plot(yhat,y)
+abline(a=0,b=1)
+```
+
+
+Finally we use a boosting model, however in this case there are multiple tuning parameters that should be set by using cross validation. Below, we have implemented a k-fold cross validation scheme to find the optimal number of trees $B$, the shrinkage parameter $\lambda$ and the interaction depth $d$.
+
+By running a 5-fold cross validation below we found the optimal paramters $B = 500$, $\lambda = 0.01$ and $d = 6$.
+
+In the end, we find the lowest MSE (or estimated SD in our case) for the boosting model. With the seed $s = 1234$ we find the following SD
+
+|Model|SD|
+|---|---|
+|Regression tree|2212.5|
+|Random forest|1802.9|
+|Boosting|1768.6|
+
+We would hence prefer to use this model, even though it is less interpretable than the regression tree. However, as seen below we could find the relative importance by how the different variables contribute to reducing the MSE.
+
+``` {r, eval = TRUE, echo = TRUE}
+set.seed(1234)
+
+boost = gbm(Outstate~.,data=college.train,distribution="gaussian",n.trees=500,interaction.depth=6,shrinkage=0.01)
+yhat = predict(boost,newdata=college.test,n.trees=500)
+y = college.test$Outstate
+MSE = mean((yhat-y)^2)
+
+print("The standard deviation when using a boosting model is: ")
+sqrt(MSE)
+
+summary(boost)
+```
+
+
+``` {r, eval = TRUE, echo = TRUE}
+#cross validation
+k = 5
+
+kFoldCV = function(k,data,paramInterval,param) {
+    
+    #Creating index set for CV
+    n = dim(data)[1]
+    allIndex = sample(1:n,n,replace=FALSE)
+    #allIndex = seq(1:n)
+    pSize = n%/%k
+    kIndex = c(1)
+    for (i in 1:k) {
+        kIndex[i+1] = pSize*i
+    }
+    kIndex[k+1] = n+1
+    
+    result = matrix(0L,ncol=2,nrow=length(paramInterval))
+    #Cross validation
+    for (i in 1:k){
+        testIndex = allIndex[kIndex[i]:(kIndex[i+1]-1)]
+        #print(i)
+        #print(testIndex)
+        trainData = data[-testIndex,]
+        testData = data[testIndex,]
+   
+        #Parameter testing
+        for (j in 1:length(paramInterval)) {
+            if (param=="trees") {
+                boost = gbm(Outstate~.,data=trainData,distribution="gaussian",n.trees=paramInterval[j],interaction.depth=6,shrinkage=0.01)
+                yhat = predict(boost,newdata = testData,n.trees=paramInterval[j])
+            }
+            if (param=="shrinkage") {
+                boost = gbm(Outstate~.,data=trainData,distribution="gaussian",n.trees=500,interaction.depth=6,shrinkage=paramInterval[j])
+            }
+            if (param=="interaction") {
+                boost = gbm(Outstate~.,trainData,distribution="gaussian",n.trees=500,interaction.depth=paramInterval[j],shrinkage=0.01)
+            }
+            
+            if (param=="test") {
+                boost = gbm(Outstate~.,trainData,distribution="gaussian",n.trees=500,interaction.depth=6,shrinkage=0.01)
+            }
+            
+            if (param!="trees") {
+                yhat = predict(boost,newdata = testData,n.trees=500)
+            }
+            
+            y = testData$Outstate
+            MSE = mean((yhat-y)^2)
+            
+            result[j,1] = paramInterval[j]
+            result[j,2] = result[j,2] + sqrt(MSE)/k        
+        }
+    }
+    return(result)
+}
+```
+
+
+``` {r, eval = TRUE, echo = TRUE}
+set.seed(1234)
+
+pIntTrees = seq(1,2000,100)
+pIntShrinkage = seq(1,100,10)/1000
+pIntInteraction = seq(1,10,1)
+
+#resT = kFoldCV(5,college.train,pIntTrees,"trees")
+#resS = kFoldCV(5,college.train,pIntShrinkage,"shrinkage")
+#resI = kFoldCV(5,college.train,pIntInteraction,"interaction")
+```
+
+
+``` {r, eval = TRUE, echo = TRUE}
+#plot(resT[,1],resT[,2],type="b",ylab="SD",xlab="Number of trees")
+#plot(resS[,1],resS[,2],type="b",ylab="SD",xlab="Shrinkage")
+#plot(resI[,1],resI[,2],type="b",ylab="SD",xlab="Interaction depth")
+```
+
+
 
 ## c)
 
-
+Need data from task 1 and 2 to answer this one.
 
 # Problem 4
 In this problem we use the data set of diabetes from a population of women of Pima Indian heritage in the US. We split the data set into a training set of 300 observations, where 200 are non-diabetic and 100 are diabetic, and a test with of 232 observations, where 155 are non-diabetic and 77 are diabetic. 
@@ -206,14 +366,166 @@ Then, since $f(x_i)$ corresponds to the linear predictor in logistic regression,
 
 # Problem 5
 
+``` {r, eval = TRUE, echo = TRUE}
+id = "1VfVCQvWt121UN39NXZ4aR9Dmsbj-p9OU" # google file ID
+GeneData = read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",id), header = F)
+colnames(GeneData)[1:20] = paste(rep("H", 20), c(1:20), sep = "")
+colnames(GeneData)[21:40] = paste(rep("D", 20), c(1:20), sep = "")
+row.names(GeneData) = paste(rep("G", 1000), c(1:1000), sep = "")
+GeneData = t(GeneData)
+```
+
 ## a)
+
+In this task we study the measurements of $1000$ genes from $40$ tissue samples. We know that the first $20$ tissue samples come from healthy patients and the remaining come from patients with disease. We will use different clustering method and principal component analysis to try to separate the two groups and study the data. 
+
+
+
+``` {r, eval = TRUE, echo = TRUE}
+gene_complete = hclust(dist(GeneData),method="complete")
+gene_complete_column = hclust(dist(t(GeneData)),method="complete")
+gene_single = hclust(dist(GeneData),method="single")
+gene_average = hclust(dist(GeneData),method="average")
+
+gene_complete_cor = hclust(as.dist(1-cor(t(GeneData))),method="complete")
+gene_single_cor = hclust(as.dist(1-cor(t(GeneData))),method="single")
+gene_average_cor = hclust(as.dist(1-cor(t(GeneData))),method="average")
+
+
+par(mfrow=c(2,3))
+plot(gene_complete)
+plot(gene_single)
+plot(gene_average)
+plot(gene_complete_cor)
+plot(gene_single_cor)
+plot(gene_average_cor)
+```
+
+Above you will find six clusterings, where the plots columnwise uses the different linkages: complete, single and average, and the plots rowwise uses the different distance measures: Euclidean and correlation. 
 
 ## b)
 
+Below we compare the classification of the different clustering methods and find that all clusters using euclidian distance all classify the tissue correctly. Furthermore we find that none of the correlation based hierarchical clustering methods. However, by cutting the tree with correlation based distance and complete linkage such that we get 5 clusters, we have get one cluster with cancer tissue and the rest with healthy tissue. 
+
+Furthermore, we see that the Euclidean distance with complete has the most balanced tree, hence this could be prefered.
+
+``` {r, eval = TRUE, echo = TRUE}
+dc = cutree(gene_complete,k=2)
+ds = cutree(gene_single,k=2)
+da = cutree(gene_average,k=2)
+cc = cutree(gene_complete_cor,k=2)
+cs = cutree(gene_single_cor,k=2)
+ca = cutree(gene_average_cor,k=2)
+
+cbind(dc,ds,da,cc,cs,ca)
+```
+
+As an additional analysis we use the heatmap-function in R to plot dendrograms applied to both the rows and columns in the GeneData. This displays in a beautiful manner that we have a group of genes that seems to separate the patients with cancer and without cancer. By cutting the tree classifying the different genes in two we can find the genes that seem to predict cancer.
+
+
+``` {r, eval = TRUE, echo = TRUE}
+heatmap(as.matrix(t(GeneData)),Rowv=as.dendrogram(gene_complete_column), Colv=as.dendrogram(gene_complete))
+
+important_genes_clust = which(cutree(gene_complete_column,k=2)==2)
+```
+
+Finally we also plot the tissue with regards to the measure of two different genes that both are identified as "important" from the above analysis. We mark them with colour based on the hierarchical clustering with Euclidean distance and complete linkage.
+
+
+``` {r, eval = TRUE, echo = TRUE}
+plot(GeneData[,502],GeneData[,565],col=cutree(gene_complete,2),pch=".",ylab="G565",xlab="G502")
+text(GeneData[,502],GeneData[,565],rownames(GeneData),col=cutree(gene_complete,2))
+```
+
 ## c)
+
+There are multiple ways to motivate Principal Component Analysis, but recalling the spectral theorem from linear algebra provides a useful framework for understanding and explanation:
+
+>**Spectral Theorem**
+>
+>Given a matrix $A \in \mathbb{R}^{n\times n}$ there exists a diagonal matrix $\Lambda = \text{diag}\{\lambda_1,\cdots,\lambda_n\}$, where $\lambda_i$ are the eigenvalues of $A$, and a unitary matrix $U$ (meaning $U^T = U^{-1}$) such that
+>
+$$
+A = U\Lambda U^{T}
+$$
+>
+>if and only if $A^TA = AA^T$, meaning $A$ is normal. 
+
+Given a datamatrix $X \in \mathbb{R}^{n\times p}$, $X = [x_1,\cdots,x_n]^T$, meaning we have $n$ observations $x_i$ of $p$ variables, lets first assume that $X$ is normalized, meaning the mean of every column (multiple observations of a given variable) is zero and the sample variance is equal to one. This is easily achieved with the Mahalanobis transformation. This yields the following estimate of the covariance matrix
+
+$$
+S = \frac{X^TX}{n}
+$$
+
+We note that $S$ is in fact symmetric and hence normal, allowing for the spectral decomposition described above
+
+$$
+S = \frac{1}{n}U\Lambda U^{T}
+$$
+
+Where the columns of $U = [u_1,\cdots,u_n]$ are the eigenvectors of $X^TX$ and the diagonal entries $\Lambda = \text{diag}\{\lambda_1,\cdots,\lambda_n\}$ the corresponding eigenvalues. Notice that as $U$ is unitary, the eigenvectors are orthonormal, meaning $u_i^Tu_j = \delta_{i,j}, i,j = 0,\cdots,n$. Finally, lets also assume that $\Lambda$ and $U$ is permutated in a way such that $\lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_n$.
+
+We now notice that as $X^TX = U\Lambda U^T$ we have that 
+
+$$
+U^TX^TXU = \Lambda
+$$
+
+And by dividing the expression above with $n$ we see that the transformation $Z = XU$ yield the very orderly estimated covariance matrix $\frac{1}{n}\Lambda$ which is diagonal with decreasing variances $\frac{\lambda_1}{n},\cdots,\frac{\lambda_n}{n}$. 
+
+The columns of $Z$ are then the principal components $z_m, m=0,\cdots,n$ with decreasing variance $\frac{\lambda_m}{n}$. For some reason unknown to the author, the elements of the principal components are also called scores and hence the scores of the first principal components would be given as
+
+$$
+z_1 = Xu_1
+$$ 
+
+As we have chosen to derive the PCA in a different way that what is done in the lecture notes, there are some differences in the notation. $p,n,X$ are the same, while we denote the matrix $\phi$ as $U$.
 
 ## d)
 
+We will now perform a principal component analysis on the gene data.
+
+``` {r, eval = TRUE, echo = TRUE}
+gene_pca = prcomp(GeneData,scale=TRUE)
+plot(gene_pca$x[,1:2],pch=".")
+text(gene_pca$x[,1:2],rownames(GeneData),col=cutree(gene_complete,2))
+
+```
+
+Above we have used the first and second principal component to plot the tissue samples, and have colored them by using the correct hierachical tree from the above exercise. Below we find the proportion of variance explained by the different principal components, and specifically the five first. We also plot this.
+
+``` {r, eval = TRUE, echo = TRUE}
+var = gene_pca$sdev^2
+prop_var = var/sum(var)
+plot(prop_var,pch=20,xlab="Principal components",ylab="Variance")
+print("Variancre explained by the 5 first PCs:")
+print(sum(prop_var[1:5]))
+```
+
+
 ## e)
 
+Below we plot the scores, or the weights of the different elements of the first principal component. Here we clearly see that there is a group of genes with a larger score than the others and find a cutoff value at $0.06$ to separate the two. We also identified genes that vary greatly between the different groups from the heatmap above. It could be seen that the two groups are almost identical. On the bottom plot we have a biplot with the genes identified.
+
+``` {r, eval = TRUE, echo = TRUE}
+gene_PC_1 = gene_pca$rotation[,1]
+plot(gene_PC_1 ,pch=20,ylab="Score of PC 1",xlab="Gene")
+cutoff = 0.06
+abline(a=cutoff,b=0)
+important_genes = which(gene_PC_1 > cutoff)
+biplot(gene_pca$x[,1:2],gene_pca$rotation[important_genes,])
+```
 ## f)
+
+Finally we use K-means clustering to separate the two groups of tissue and see that in fact, this algorithm is also fully succsessfully, having an error rate of zero. 
+
+``` {r, eval = TRUE, echo = TRUE}
+gene_km = kmeans(as.matrix(GeneData),2,nstart=20)
+plot(gene_pca$x[,1:2],pch=".")
+text(gene_pca$x[,1:2],rownames(GeneData),col=gene_km$cluster+1)
+gene_km$cluster
+```
+
+
+
+
