@@ -27,8 +27,8 @@ knitr::opts_chunk$set(eval = TRUE, echo = TRUE,tidy=TRUE,message=FALSE,warning=F
 #install.packages("e1071")
 #install.packages("tree")
 #install.packages("leaps")
-#install.packages("randomForest")
-#install.packages("gbm")
+install.packages("randomForest")
+install.packages("gbm")
 #install.packages("ggfortify")
 
 library(knitr)
@@ -315,7 +315,7 @@ The SVC also has both a higher sensitivity and specificity. The sensitivities fo
 We now compare the performance of the two classifiers from 4b) to a classification tree. As for the SVC and SVM we fit a model, now a classification tree, to our training set, before we use the test set to find the confusion table and misclassification error rate of the method.
 ```{r, eval = TRUE, echo = TRUE}
 d.tree = tree(diabetes ~ ., data = d.train)
-tree.pred = predict(d.tree, d.test$diabetes, type = "class")
+tree.pred = predict(d.tree, d.test, type = "class")
 tree.ct = table(tree.pred, d.test$diabetes)
 tree.mcr = 1 - sum(diag(tree.ct))/sum(tree.ct)
 print(paste0("Confusion table: ", tree.ct))
@@ -360,6 +360,14 @@ l(z) &= -log(\Pi_{i=1}^n P(y_i | x_i)) = - \sum_{i=1}^n log(P(y_i | x_i)) = - \s
 
 &=  \sum_{i=1}^n log(1 + e^{-y_i x_i})
 \end{split}
+$$
+The following formulas are used in the computation:
+$$
+\begin{split}
+log\bigg{(}\frac{\sigma(x_i)}{1-\sigma(x_i)}\bigg{)} = log\bigg{(} \frac{1 + e^{x_i}}{1 + e^{-x_i}} \bigg{)} = log \bigg{(} \frac{e^{x_i} (1 + e^{-x_i})}{1 + e^{-x_i}} \bigg{)} = x_i
+\end{split} \\
+log(\sigma(-x_i)) = log(1 - \sigma(x_i)) = log \bigg{(} \frac{1}{1/(1 + e^{-x_i})} \bigg{)} = log(1 + e^{-x_i}) \\
+-y_i x_i + log(1 + e^{x_i}) = log(1 + e^{-y_i x_i}) \qquad \text{ Since } y_i = \pm 1.
 $$
 Then, since $f(x_i)$ corresponds to the linear predictor in logistic regression, we can replace $x_i$ by $f(x_i)$ in the result above, which shows that the deviance for the $y = \pm 1$ encoding in logistic regression is the same as the given loss function $log(1 + e^{y_i f(x_i)})$.
 
