@@ -151,18 +151,18 @@ cv.out=cv.glmnet(x=train.mat,y =college.train$Outstate, alpha=1)
 bestlam=cv.out$lambda.min
 
 #Get coeffs of best model
-coefsLasso = coef(cv.out, "lambda.min")
+coefsLasso = coef(cv.out, s="lambda.min")
 
 #Calulate the test MSE
-lasso.pred=predict(cv.out, newx=test.mat, "lambda.min")
+lasso.pred=predict(cv.out, newx=test.mat, s="lambda.min")
 test_MSE_Lasso = mean((lasso.pred-college.test$Outstate)^2)
 ````
 Using the `cv.glmnet` ¨the value for $\lambda$ is chosen by testing a sequence of $\lambda$-values with 10-fold cross validation. The $\lambda$-value with the lowest cross validation error is `r bestlam`. The set test MSE on the test data is `r test_MSE_Lasso` and so it is lower than using forward selection and BIC. The variables selected are:
 
 ``` {r, eval = TRUE, echo = TRUE}
-coefsLasso
+coefsLasso[1:19,]
 ``` 
-
+Notice that the coefficients having high values are about the same as in forward selection.
 # Problem 2
 
 ## a)
