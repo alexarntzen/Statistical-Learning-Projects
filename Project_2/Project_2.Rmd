@@ -337,6 +337,7 @@ pIntInteraction = seq(1,10,1)
 
 Need data from task 1 and 2 to answer this one.
 
+
 # Problem 4
 In this problem we use the data set of diabetes from a population of women of Pima Indian heritage in the US. We split the data set into a training set of 300 observations, where 200 are non-diabetic and 100 are diabetic, and a test with of 232 observations, where 155 are non-diabetic and 77 are diabetic. 
 
@@ -356,7 +357,7 @@ cor(d.train)
 corrplot(cor(d.train))
 ggpairs(d.train)
 ```
-TRUE, TRUE, TRUE, TRUE (???)(Skummelt med så mange like, ass)
+TRUE, TRUE, TRUE, TRUE 
 
 ## b)
 To fit a support vector classifier and a support vector machine to the problem, the response variable $\texttt{diabetes}$ must first be converted into a factor variable.
@@ -379,8 +380,10 @@ svc.bestmod = tune.cost$best.model
 svc.pred = predict(svc.bestmod, d.test)
 svc.ct = table(predict = svc.pred, truth = d.test$diabetes)  # Confusion table
 svc.mcr = 1 - sum(diag(svc.ct))/sum(svc.ct)                  # Misclassification error rate
-print(paste0("Confusion table: ", svc.ct))
-print(paste0("Misclassification error rate: ", svc.mcr))
+print(paste0("Confusion table: "))
+svc.ct
+print(paste0("Misclassification error rate: "))
+svc.mcr
 ```
 
 Similarly, we now fit a support vector machine with a radial boundary. Cross-validation is now used to find the optimal combination of cost and $\gamma$ parameters. 
@@ -398,8 +401,10 @@ svm.bestmod = tune.costgamma$best.model
 svm.pred = predict(svm.bestmod, d.test)
 svm.ct = table(predict = svm.pred, truth = d.test$diabetes)
 svm.mcr = 1 - sum(diag(svm.ct))/sum(svm.ct)
-print(paste0("Confusion table: ", svm.ct))
-print(paste0("Misclassification error rate: ", svm.mcr))
+print(paste0("Confusion table: "))
+svm.ct
+print(paste0("Misclassification error rate: "))
+svm.mcr
 ```
 Based on the confusion tables and their associated misclassification error rates, we can see that the support vector classifier performs better than the support vector machine, with a misclassification error rate of $0.228$ instead of $0.259$ for the support vector machine. Out of these two classifiers, we thus prefer the support vector classifier, even if the difference is relatively small.  
 The SVC also has both a higher sensitivity and specificity. The sensitivities for the SVC and SVM, respectively, are $0.884$ and $0.858$. The respective specificities are $0.545$ and $0.507$.  
@@ -416,28 +421,22 @@ print(paste0("Misclassification error rate: ", tree.mcr))
 ```
 Note that $\texttt{cv.tree}$ automatically does 10-fold cross-validation, so we don't have to prune the tree in the same way that we had to find the optimal cost and $\gamma$ parameters in Problem 4b). We observe from the confusion table and the misclassification error rate that the classification tree performed better than the support vector machine, but worse than the support vector classifier. 
 The sensitivity of this method is $0.813$, which is lower than the values for both of the classifiers from 4b). However, the specificity, $0.636$, is better. 
-BØR VI LAGE ET PLOT MED FALSE POSITIVE RATE VS. TRUE POSITIVE RATE HER FOR Å SAMMENLIGNE?
 
 Classification trees are in general, and especially for non-staticians, much easier to interpret than other classification methods. The structure and visualization of the tree is what makes it so easy to interpret, and the method is thus more used by non-staticians than SVM. In addition, the structure of the classification tree shows which predictor is the most important, by splitting on this predictor first. 
 Neither classification trees nor SVMs make a huge amount of assumptions, for example about the distribution of the data. Thus they are less affected by outliers, and in that matter no method is preferred over the other one. Trees are often computed quite fast, but the greedy algorithm might not be as accurate as the SVM. However, the SVM can be harder to train, and without good parameters a good performance is not guaranteed - while trees are often very good classifiers.
 Finally, the process where the SVM projects the feature space into a kernel space before it is projected back to the original feature space, can produce a non-linear decision boundary that performs better than the hyperrectangles of the classification trees.
-GJERNE LEGG TIL MER OM DERE HAR GODE PUNKTER!!!
 
 
 ## d)
-(i) FALSE
-(ii) FALSE
-(iii) TRUE ???
-(iv) TRUE ???
+FALSE, FALSE, TRUE, TRUE
 
-(Husk å skrive om til riktig form)
 
 ## e)
 After manipulating the logistic function a little bit, we obtain
 $$
 \begin{split}
   log \frac{P(x_i)}{1-P(x_i)} = f(x_i) \\
-  \implies P(y_i | x; \beta) = \frac{e^{f(x_i)}}{1 + e^{f(x_i)} = \frac{1}{1 + e^{-f(x_i)}}.
+  \implies P(y_i | x; \beta) = \frac{e^{f(x_i)}}{1 + e^{f(x_i)}} = \frac{1}{1 + e^{-f(x_i)}}.
 \end{split}
 $$
 Let $\sigma$ be a function such that $P(y_i = 1 | x_i) = \sigma(x_i)$ and $P(y_i = -1 | x_i) = 1 - \sigma(x_i) = \sigma(-x_i)$, where the last equality comes from the properties of the function and can easily be seen by rewriting the equation a little bit. The cumulative distribution function can then be written as $P(y_i | x_i) = \sigma(x_i)^{y_i} (1-\sigma(x_i))^{1-y_i}$, which we recognize as a binomial PMF with $p = \sigma(x_i)$.
