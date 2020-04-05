@@ -109,7 +109,7 @@ $$
 $$
 
 ## c)
-TRUE, FALSE, FALSE, true 
+TRUE, FALSE, FALSE, TRUE 
 
 ## d)
 
@@ -138,7 +138,9 @@ test_MSE_Forward = mean((college.test$Outstate-pred)^2)
 
 Using the `regsubsets` forward selection is performed on the test data set.  The model with the last BIC is chosen as this penalizes models with more variables. This model has `r numCoeffs` coefficients , excluding the intercept, a test MSE of `r test_MSE_Forward` and the following coefficients:  
 
-`r modelCoeffs`
+``` {r, eval = TRUE, echo = TRUE}
+modelCoeffs
+```
 
 Note that we have not trained the model on the full dataset in order to compare the test MSE between d) and e). 
 
@@ -155,7 +157,11 @@ coefsLasso = coef(cv.out, "lambda.min")
 lasso.pred=predict(cv.out, newx=test.mat, "lambda.min")
 test_MSE_Lasso = mean((lasso.pred-college.test$Outstate)^2)
 ````
-Using the `cv.glmnet` ¨the value for $\lambda$ is chosen by testing a sequence of $\lambda$-values with 10-fold cross validation. The $\lambda$-value with the lowest cross validation error is `r bestlam`. The set test MSE on the test data is ´r test_MSE_Lasso´ and the variables selected are: `r coefsLasso`.
+Using the `cv.glmnet` ¨the value for $\lambda$ is chosen by testing a sequence of $\lambda$-values with 10-fold cross validation. The $\lambda$-value with the lowest cross validation error is `r bestlam`. The set test MSE on the test data is ´r test_MSE_Lasso´ and the variables selected are:
+
+``` {r, eval = TRUE, echo = TRUE}
+coefsLasso
+``` 
 
 # Problem 2
 
@@ -446,20 +452,17 @@ $$
 \begin{split}
 l(z) &= -log(\Pi_{i=1}^n P(y_i | x_i)) = - \sum_{i=1}^n log(P(y_i | x_i)) = - \sum_{i=1}^n log \bigg{(}\sigma(x_i)^{y_i} (1-\sigma(x_i))^{1-y_i}\bigg{)} \\
 &= - \sum_{i=1}^n \bigg{(}y_i log (\sigma(x_i)) + (1-y_i) log (1-\sigma(x_i))\bigg{)} = -\sum_{i=1}^n \bigg{(}y_i(log(\sigma(x_i)) - log(-\sigma(x_i))) + log(-\sigma(x_i))\bigg{)}\\
-&= -\sum_{i=1}^n \bigg{(} y_i log(\frac{\sigma(x_i)}{1-\sigma(x_i)}) + log(\sigma(-x_i)) \bigg{)} = -\sum_{i=1}^n (y_i x_i + log(-\sigma(x_i)) )  
- \\
-
-
+&= -\sum_{i=1}^n \bigg{(} y_i log(\frac{\sigma(x_i)}{1-\sigma(x_i)}) + log(\sigma(-x_i)) \bigg{)} = -\sum_{i=1}^n (y_i x_i + log(-\sigma(x_i)) )  \\
 &=  \sum_{i=1}^n log(1 + e^{-y_i x_i})
 \end{split}
 $$
 The following formulas are used in the computation:
 $$
 \begin{split}
-log\bigg{(}\frac{\sigma(x_i)}{1-\sigma(x_i)}\bigg{)} = log\bigg{(} \frac{1 + e^{x_i}}{1 + e^{-x_i}} \bigg{)} = log \bigg{(} \frac{e^{x_i} (1 + e^{-x_i})}{1 + e^{-x_i}} \bigg{)} = x_i
-\end{split} \\
+log\bigg{(}\frac{\sigma(x_i)}{1-\sigma(x_i)}\bigg{)} = log\bigg{(} \frac{1 + e^{x_i}}{1 + e^{-x_i}} \bigg{)} = log \bigg{(} \frac{e^{x_i} (1 + e^{-x_i})}{1 + e^{-x_i}} \bigg{)} = x_i \\
 log(\sigma(-x_i)) = log(1 - \sigma(x_i)) = log \bigg{(} \frac{1}{1/(1 + e^{-x_i})} \bigg{)} = log(1 + e^{-x_i}) \\
 -y_i x_i + log(1 + e^{x_i}) = log(1 + e^{-y_i x_i}) \qquad \text{ Since } y_i = \pm 1.
+\end{split} 
 $$
 Then, since $f(x_i)$ corresponds to the linear predictor in logistic regression, we can replace $x_i$ by $f(x_i)$ in the result above, which shows that the deviance for the $y = \pm 1$ encoding in logistic regression is the same as the given loss function $log(1 + e^{y_i f(x_i)})$.
 
