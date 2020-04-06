@@ -188,15 +188,12 @@ $$
 ## c)
 ``` {r, eval = TRUE, echo = TRUE,  fig1, fig.height = 6, fig.width = 9, fig.align = "center"}
 # scatterplots 
-mod = lm(Outstate~perc.alumni,data= college.train)
-plot(mod)
-
-p1 = ggplot(data=college, aes(x=Private, y=Outstate)) + geom_point()  
-p2 = ggplot(data=college, aes(x=Room.Board, y=Outstate)) + geom_point() 
-p3 = ggplot(data=college, aes(x=Terminal, y=Outstate)) + geom_point()  
-p4 = ggplot(data=college, aes(x=perc.alumni, y=Outstate)) + geom_point() 
-p5 = ggplot(data=college, aes(x=Expend, y=Outstate)) + geom_point()  
-p6 = ggplot(data=college, aes(x=Grad.Rate, y=Outstate)) + geom_point() 
+p1 = ggplot(data=College, aes(x=Private, y=Outstate)) + geom_point()  
+p2 = ggplot(data=College, aes(x=Room.Board, y=Outstate)) + geom_point() 
+p3 = ggplot(data=College, aes(x=Terminal, y=Outstate)) + geom_point()  
+p4 = ggplot(data=College, aes(x=perc.alumni, y=Outstate)) + geom_point() 
+p5 = ggplot(data=College, aes(x=Expend, y=Outstate)) + geom_point()  
+p6 = ggplot(data=College, aes(x=Grad.Rate, y=Outstate)) + geom_point() 
 ggarrange(
   p1, p2, p3,
   p4, p5, p6,
