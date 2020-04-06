@@ -188,12 +188,15 @@ $$
 ## c)
 ``` {r, eval = TRUE, echo = TRUE,  fig1, fig.height = 6, fig.width = 9, fig.align = "center"}
 # scatterplots 
-p1 = ggplot(data=college.train, aes(x=Private, y=Outstate)) + geom_point()  
-p2 = ggplot(data=college.train, aes(x=Room.Board, y=Outstate)) + geom_point() 
-p3 = ggplot(data=college.train, aes(x=Terminal, y=Outstate)) + geom_point()  
-p4 = ggplot(data=college.train, aes(x=perc.alumni, y=Outstate)) + geom_point() 
-p5 = ggplot(data=college.train, aes(x=Expend, y=Outstate)) + geom_point()  
-p6 = ggplot(data=college.train, aes(x=Grad.Rate, y=Outstate)) + geom_point() 
+mod = lm(Outstate~perc.alumni,data= college.train)
+plot(mod)
+
+p1 = ggplot(data=college, aes(x=Private, y=Outstate)) + geom_point()  
+p2 = ggplot(data=college, aes(x=Room.Board, y=Outstate)) + geom_point() 
+p3 = ggplot(data=college, aes(x=Terminal, y=Outstate)) + geom_point()  
+p4 = ggplot(data=college, aes(x=perc.alumni, y=Outstate)) + geom_point() 
+p5 = ggplot(data=college, aes(x=Expend, y=Outstate)) + geom_point()  
+p6 = ggplot(data=college, aes(x=Grad.Rate, y=Outstate)) + geom_point() 
 ggarrange(
   p1, p2, p3,
   p4, p5, p6,
@@ -202,7 +205,7 @@ ggarrange(
   ) 
 
 ```
-From the scatter plots above `Room.Board` and `perc.alumni` seem to have a linear relationship with `Outstate`. Conversely, `Terminal`, `Expend` and to some degree `Grad.Rate` seem to benefit form a non-linear transformation.
+From the scatter plots above `Room.Board` and `perc.alumni` seem to have a linear relationship with `Outstate`. Conversely, `Terminal`, `Expend` and to some degree `Grad.Rate` seem to benefit form a non-linear transformation. There are also other plots that could have been used. For example Q–Q plots of standardized residual or test MSE for different degree of polynomial regression.
 
 ## d)
 
