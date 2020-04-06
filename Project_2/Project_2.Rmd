@@ -12,7 +12,7 @@ subtitle: TMA4268 Statistical Learning V2020
 ```{r setup, include=FALSE}
 library(knitr)
 knitr::opts_chunk$set(eval = TRUE, echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
-                      cache=TRUE, size="scriptsize",fig.width=4, fig.height=3)
+                      cache=TRUE, size="scriptsize")
 
 ```
 
@@ -331,7 +331,7 @@ In the end, we find the lowest MSE (or estimated SD in our case) for the boostin
 |Random forest|1802.9|
 |Boosting|1768.6|
 
-We would hence prefer to use this model, even though it is less interpretable than the regression tree. However, as seen below we could find the relative importance by how the different variables contribute to reducing the MSE.
+We would hence prefer to use this model, even though it is less interpretable than the regression tree. However, as seen below we could find the relative importance by how the different variables contribute to reducing the MSE. It is also expected that trees have high variance and small changes in the data can cause large changes in the final tree.
 
 ``` {r, eval = TRUE, echo = TRUE}
 set.seed(1234)
