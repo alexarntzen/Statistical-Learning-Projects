@@ -48,6 +48,7 @@ library(randomForest)
 library(gbm)
 library(leaps)
 library(glmnet)
+library(ggpubr)
 theme_set(theme_bw())
 ```
 
@@ -84,7 +85,7 @@ $$
 $$
 
 ## b)
-Fistly we have by definition of the linear model that
+Firstly, we have by definition of the linear model that
 $$
 \mathrm{E}[y] =  \mathrm{E}[X\beta+ \epsilon] = X\beta + \mathrm{E}[\epsilon]= X\beta,
 $$
@@ -104,7 +105,7 @@ $$
 \begin{aligned}
 \mathrm{Var}[\hat{\beta}_{Ridge} ] &= (X^TX  +\lambda I)^{-1}X^T)\mathrm{Var}[y](X^TX  +\lambda I)^{-1}X^T)^T \\
 &= (X^TX  +\lambda I)^{-1}X^T\sigma^2 I X (X^TX +\lambda I)^{-1} \\
-&= \boldsymbol{ \sigma^2(X^TX  +\lambda I)^{-1} X^T X (X^TX+\lambda I)^{-1} }
+&=\boldsymbol{ \sigma^2(X^TX  +\lambda I)^{-1} X^T X (X^TX+\lambda I)^{-1} }
 \end{aligned}
 $$
 
@@ -125,7 +126,6 @@ selection.forward <- regsubsets(Outstate~ . , data=college.train,  method="forwa
 test.mat=model.matrix(Outstate~.,data=college.test)
 train.mat=model.matrix(Outstate~.,data=college.train)
 
-
 #Choosing model
 numCoeffs = which.min(summary(selection.forward)$bic)
 modelCoeffs <- coef(selection.forward,id=numCoeffs)
@@ -133,7 +133,6 @@ modelCoeffs <- coef(selection.forward,id=numCoeffs)
 #Calculating test MSE
 pred=test.mat[,names(modelCoeffs)]%*%modelCoeffs
 test_MSE_Forward = mean((college.test$Outstate-pred)^2)
-
 ````
 
 Using the `regsubsets` forward selection is performed on the test data set.  The model with the last BIC is chosen as this penalizes models with more variables. This model has `r numCoeffs` coefficients , excluding the intercept, a test MSE of `r test_MSE_Forward` and the following coefficients:  
@@ -147,32 +146,122 @@ Note that we have not trained the model on the full dataset in order to compare 
 ## e)
 ``` {r, eval = TRUE, echo = TRUE}
 #Calulate the best lambda using 10 fold CV
-cv.out=cv.glmnet(x=train.mat,y =college.train$Outstate, alpha=1)
+cv.out=cv.glmnet(x=train.mat[,2:18],y =college.train$Outstate, alpha=1)
 bestlam=cv.out$lambda.min
-
 #Get coeffs of best model
 coefsLasso = coef(cv.out, s="lambda.min")
 
 #Calulate the test MSE
-lasso.pred=predict(cv.out, newx=test.mat, s="lambda.min")
+lasso.pred=predict(cv.out, newx=test.mat[,2:18], s="lambda.min")
 test_MSE_Lasso = mean((lasso.pred-college.test$Outstate)^2)
 ````
 Using the `cv.glmnet` ¨the value for $\lambda$ is chosen by testing a sequence of $\lambda$-values with 10-fold cross validation. The $\lambda$-value with the lowest cross validation error is `r bestlam`. The set test MSE on the test data is `r test_MSE_Lasso` and so it is lower than using forward selection and BIC. The variables selected are:
 
 ``` {r, eval = TRUE, echo = TRUE}
-coefsLasso[1:19,]
+coefsLasso[1:18,]
 ``` 
-Notice that the coefficients having high values are about the same as in forward selection.
+Notice that the the lasso model gives a nonzero value for all coefficients, bu as the high values for the same coefficients as forward selection.
+
 # Problem 2
 
 ## a)
+FALSE, FALSE, TRUE, TRUE
 
 ## b)
+The basis functions for the cubic spline with knots $d_1$, $d_2$ and $d_3$ are
+$$
+\begin{aligned}
+& x & h(x,d_1)\\
+& x^2 & h(x,d_2) \\
+& x^3 & h(x,d_2), 
+\end{aligned}
+$$
+where 
+$$
+h(x,d) = 
+\begin{cases} 
+   (x-d)^3  &\mathrm{if} \ x>d \\
+    0       &\mathrm{otherwise}
+ \end{cases}
+$$
 
 ## c)
+``` {r, eval = TRUE, echo = TRUE,  fig1, fig.height = 6, fig.width = 9, fig.align = "center"}
+# scatterplots 
+p1 = ggplot(data=college.train, aes(x=Private, y=Outstate)) + geom_point()  
+p2 = ggplot(data=college.train, aes(x=Room.Board, y=Outstate)) + geom_point() 
+p3 = ggplot(data=college.train, aes(x=Terminal, y=Outstate)) + geom_point()  
+p4 = ggplot(data=college.train, aes(x=perc.alumni, y=Outstate)) + geom_point() 
+p5 = ggplot(data=college.train, aes(x=Expend, y=Outstate)) + geom_point()  
+p6 = ggplot(data=college.train, aes(x=Grad.Rate, y=Outstate)) + geom_point() 
+ggarrange(
+  p1, p2, p3,
+  p4, p5, p6,
+  ncol = 3, 
+  nrow = 2
+  ) 
+
+```
+From the scatter plots above `Room.Board` and `perc.alumni` seem to have a linear relationship with `Outstate`. Conversely, `Terminal`, `Expend` and to some degree `Grad.Rate` seem to benefit form a non-linear transformation.
 
 ## d)
 
+### i)
+``` {r, eval = TRUE, echo = TRUE, fig2, fig.height = 5, fig.width = 10, fig.align = "center"}
+
+poly_MSE_errors = rep(NA,10)
+par(mfrow=c(1,2))
+plot(college.train$Terminal,college.train$Outstate, xlab="Terminal", ylab="Outstate")
+for (i in 1:10){
+  #Calculate and plot 
+  reg.poly = lm(Outstate ~ poly(Terminal,i), data=college.train)
+  x0 <- seq(min(college.train$Terminal), max(college.train$Terminal), length = 100)
+  y0 = predict.lm(reg.poly, newdata=list(Terminal=x0))
+  k=i %% 5 
+  lines(x0,  y0, col=k,lty=k)
+  
+  #Calculate test MSE 
+  pred.poly = predict.lm(reg.poly,newdata=list(Terminal=college.test$Terminal))
+  poly_MSE_errors[i] = mean((pred.poly-college.test$Outstate)^2)
+  
+  # Plot in two figures
+  if (i==5){
+    legend("topleft", legend=c("Degree 1", "Degree 2", "Degree 3", "Degree 4", "Degree 5"), col=c(1, 2,3,4,5), lty=1:2, cex=0.8)
+    plot(college.train$Terminal,college.train$Outstate, ,xlab="Terminal", ylab="Outstate")
+  }
+}
+legend("topleft", legend=c("Degree 6", "Degree 7", "Degree 8", "Degree 9", "Degree 10"),
+       col=c(1, 2,3,4,5), lty=1:2, cex=0.8)
+
+
+```
+In the two plots above show regression with polynomials of different degrees.
+
+### ii)
+
+``` {r, eval = TRUE, echo = TRUE}
+reg.smooth=smooth.spline(x=college.train$Expend, y=college.train$Outstate,cv=TRUE)
+
+plot(college.train$Expend,college.train$Outstate, xlab="Expend", ylab="Outstate")
+lines(reg.smooth, col="blue")
+legend("bottomright", legend=c("smoothing spline"), col=("blue"),lty=1, cex=0.8)
+
+pred.smooth = predict(reg.smooth,newdata=list(Expend=college.test$Expend))
+test_MSE_smooth = mean((pred.smooth$y-college.test$Outstate)^2)
+```
+In the plot above shows smoothing spline regression of `Outstate` depending on `Expend`. The model degree of freedom is `r reg.smooth$df` and was chosen by performing leave-one-out cross-validation, and choosing the model with least leave-one-out cross-validation error. 
+
+### iii)
+``` {r, eval = TRUE, echo = TRUE}
+cat("Test MSEs: \n")
+for (i in seq(1, 10, by=2)){
+  cat("deg",i,":",poly_MSE_errors[i])
+  cat(", deg",i+1,":",poly_MSE_errors[i+1])
+  cat("\n")
+}
+cat("smooth:",test_MSE_smooth)
+```
+The test MSEs are printed above. I would have expected that polynomials of high order would give high error because of overfitting witch seems to be the case for the polynomial regression. The reason for the high test MSE for the smoothing spline can be similarly explained by the relatively high degree of freedom. 
 
 
 # Problem 3
