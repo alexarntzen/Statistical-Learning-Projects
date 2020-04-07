@@ -279,9 +279,6 @@ cat("smooth:",train_MSE_smooth)
 ```
 The training MSEs are printed above. I would have expected that polynomials regression of high order would give lower training MSEs as they are more flexible. The smoothing spline seemed to fit the data well, but had a high training MSE. This might be because of high variance in the dataset. 
 
-Move this to 3d)
-The test MSEs are printed above. I would have expected that polynomials of high order would give high error because of overfitting which seems to be the case for the polynomial regression. The reason for the high test MSE for the smoothing spline can be similarly explained by the relatively high degree of freedom. 
-
 
 # Problem 3
 
@@ -296,15 +293,10 @@ The test MSEs are printed above. I would have expected that polynomials of high 
 
 We try to make models based on a regression tree, random forest and by using boosting. The aim is to predict the variable *Outstate* by using the other variables in the *College* dataset as predictors.
 
-In order to find a test MSE we make a test and training set, where we use $70%$ of the data for training and the rest for testing.
-
 ``` {r, eval = TRUE, echo = FALSE}
 set.seed(1234)
 n = dim(College)[1]
 p = dim(College)[2]
-train = sample(1:n,0.7*n,replace = FALSE)
-college.train = College[train,]
-college.test = College[-train,]
 ```
 
 We first try a regression tree and print the estimated standard deviation (root of the MSE). We also plot the estimated Outstate cost $\hat y$ against the Outstate cost for our testing dataset $y$, to get an idea of the model performance.
@@ -313,9 +305,8 @@ We first try a regression tree and print the estimated standard deviation (root 
 tree = tree(Outstate~.,data=college.train)
 yhat = predict(tree,newdata=college.test)
 y = college.test$Outstate
-MSE = mean((yhat-y)^2)
-print("The standard deviation when using a regression tree model is: ")
-sqrt(MSE)
+MSE_regtree = mean((yhat-y)^2)
+cat("The standard deviation when using a regression tree model is:",sqrt(MSE_regtree))
 
 plot(yhat,y,pch=20)
 abline(a=0,b=1)
@@ -328,10 +319,9 @@ We do the same as above, only using a random forest model. On the plot below we 
 rf = randomForest(Outstate~.,data=college.train,mtry=p-1,ntree=1000)
 yhat = predict(rf,newdata=college.test)
 y = college.test$Outstate
-MSE = mean((yhat-y)^2)
+MSE.ranfor = mean((yhat-y)^2)
 
-print("The standard deviation when using a random forest model is: ")
-sqrt(MSE)
+cat("The standard deviation when using a random forest model is: ",sqrt(MSE.ranfor))
 
 plot(yhat,y)
 abline(a=0,b=1)
@@ -346,9 +336,9 @@ In the end, we find the lowest MSE (or estimated SD in our case) for the boostin
 
 |Model|SD|
 |---|---|
-|Regression tree|2212.5|
-|Random forest|1802.9|
-|Boosting|1768.6|
+|Regression tree|2045|
+|Random forest|1663|
+|Boosting|1612|
 
 We would hence prefer to use this model, even though it is less interpretable than the regression tree. However, as seen below we could find the relative importance by how the different variables contribute to reducing the MSE. It is also expected that trees have high variance and small changes in the data can cause large changes in the final tree.
 
@@ -358,12 +348,10 @@ set.seed(1234)
 boost = gbm(Outstate~.,data=college.train,distribution="gaussian",n.trees=500,interaction.depth=6,shrinkage=0.01)
 yhat = predict(boost,newdata=college.test,n.trees=500)
 y = college.test$Outstate
-MSE = mean((yhat-y)^2)
+MSE.boost = mean((yhat-y)^2)
 
-print("The standard deviation when using a boosting model is: ")
-sqrt(MSE)
+cat("The standard deviation when using a boosting model is:",sqrt(MSE.boost))
 
-summary(boost)
 ```
 
 
@@ -426,31 +414,46 @@ kFoldCV = function(k,data,paramInterval,param) {
 ```
 
 
-``` {r, eval = TRUE, echo = TRUE}
+``` {r, eval = FALSE, echo = TRUE}
 set.seed(1234)
 
 pIntTrees = seq(1,2000,100)
 pIntShrinkage = seq(1,100,10)/1000
 pIntInteraction = seq(1,10,1)
 
-#resT = kFoldCV(5,college.train,pIntTrees,"trees")
-#resS = kFoldCV(5,college.train,pIntShrinkage,"shrinkage")
-#resI = kFoldCV(5,college.train,pIntInteraction,"interaction")
+# Tuning of boosting parameters
+resT = kFoldCV(5,college.train,pIntTrees,"trees")
+resS = kFoldCV(5,college.train,pIntShrinkage,"shrinkage")
+resI = kFoldCV(5,college.train,pIntInteraction,"interaction")
 ```
 
 
-``` {r, eval = TRUE, echo = TRUE}
-#plot(resT[,1],resT[,2],type="b",ylab="SD",xlab="Number of trees")
-#plot(resS[,1],resS[,2],type="b",ylab="SD",xlab="Shrinkage")
-#plot(resI[,1],resI[,2],type="b",ylab="SD",xlab="Interaction depth")
+``` {r, eval = FALSE, echo = TRUE}
+# Plotting SD vs Parametes from CV
+plot(resT[,1],resT[,2],type="b",ylab="SD",xlab="Number of trees")
+plot(resS[,1],resS[,2],type="b",ylab="SD",xlab="Shrinkage")
+plot(resI[,1],resI[,2],type="b",ylab="SD",xlab="Interaction depth")
 ```
-
-
 
 ## c)
 
-Need data from task 1 and 2 to answer this one.
 
+``` {r, eval = TRUE, echo = TRUE}
+method.Poly = rep("Polynomial of degree ",10)
+for (i in 1:10){
+  method.Poly[i] = paste(method.Poly[i], i)
+}
+
+MSE.table1 = data.frame(Method = method.Poly , test_MSE = poly_MSE_test)
+methods = c("Forward selection", "Lasso", "Smoothing spline","Regression Tree", "Boosting")
+MSEs = c(test_MSE_Forward, test_MSE_Lasso, test_MSE_smooth,MSE_regtree, MSE.boost)
+MSE.table2 = data.frame(Method=methods ,test_MSE = MSEs)
+
+print(union(MSE.table1, MSE.table2))
+```
+The test MSEs are printed above. We see that polynomials of high order give large error because of overfitting. However, some high order polynomials did have low test MSE indications a nonlinear relationship between  `Outstate`and `Expend`. The reason for the high test MSE for the smoothing spline can be similarly explained by the relatively high degree of freedom. As polynomial and smoothing spline regression were performed with only one covariate it is expected that these models had higher test MSE than the rest. 
+
+We also see that the linear models performed worse than Boosting. This indicates that the response is not well approximated by a linear model. Still, if interpretability was the highest priority the tree model would probably be the best choice. 
 
 # Problem 4
 In this problem we use the data set of diabetes from a population of women of Pima Indian heritage in the US. We split the data set into a training set of 300 observations, where 200 are non-diabetic and 100 are diabetic, and a test with of 232 observations, where 155 are non-diabetic and 77 are diabetic. 
