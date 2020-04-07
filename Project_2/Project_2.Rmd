@@ -12,7 +12,7 @@ subtitle: TMA4268 Statistical Learning V2020
 ```{r setup, include=FALSE}
 library(knitr)
 knitr::opts_chunk$set(eval = TRUE, echo = TRUE,tidy=TRUE,message=FALSE,warning=FALSE,strip.white=TRUE,prompt=FALSE,
-                      cache=TRUE, size="scriptsize",fig.width=4, fig.height=3)
+                      cache=TRUE, size="scriptsize")
 
 ```
 
@@ -30,6 +30,7 @@ knitr::opts_chunk$set(eval = TRUE, echo = TRUE,tidy=TRUE,message=FALSE,warning=F
 #install.packages("randomForest")
 #install.packages("gbm")
 #install.packages("ggfortify")
+install.packages("CRAN")
 
 library(knitr)
 library(rmarkdown)
@@ -58,9 +59,9 @@ theme_set(theme_bw())
 From the textbook we know that the ridge regression estimator $\hat{\beta}_{Ridge}$ is given by the optimization problem. 
 
 $$
-\min_{\beta\in \mathbb{R}^{p+1})}{(\left\| y-X\beta\ \right\|_2^2+\lambda \left\| I\beta\ \right\|_2^2)}
+\min_{\beta\in \mathbb{R}^{p+1})}{(\left\| y-X\beta\ \right\|_2^2+\lambda \left\| I\beta\ \right\|_2^2),}
 $$
-,where $X$ is the data matrix, $y$ is the measured response and $\beta$ is ridge regression estimator. Also note that $I = diag(0,1,...,1)$, so that intercept is not penalized. The function to be minimized is a non-negative polynomial. Therefore it's minimal value exists and is a singular value. Thus $\hat{\beta}_{Ridge}$ must be such that
+where $X$ is the data matrix, $y$ is the measured response and $\beta$ is ridge regression estimator. Also note that $I = diag(0,1,...,1)$, so that intercept is not penalized. The function to be minimized is a non-negative polynomial. Therefore it's minimal value exists and is a singular value. Thus $\hat{\beta}_{Ridge}$ must be such that
 $$
 \frac{\partial }{\partial\beta } (\left\| y-X\beta\ \right\|_2^2+\lambda \left\| \beta\ \right\|_2^2) = 0.
 $$
@@ -79,7 +80,7 @@ $$
 (X^TX  +\lambda I)\beta =X^Ty.
 \end{aligned}
 $$
-Then if $\lambda$ is large enough $(X^TX  +\lambda I)$ will be inevitable yielding 
+Then if $\lambda$ is large enough $(X^TX  +\lambda I)$ will be inevitable, yielding 
 $$
 \hat{\beta}_{Ridge} =(X^TX  +\lambda I)^{-1}X^Ty.
 $$
@@ -100,7 +101,7 @@ $$
 &= \boldsymbol{(X^TX  +\lambda I)^{-1}X^TX\beta}.
 \end{aligned}
 $$
-The covariance matrix for  $\hat{\beta}_{Ridge}$ is simmilarly
+The covariance matrix for  $\hat{\beta}_{Ridge}$ is similarly
 $$
 \begin{aligned}
 \mathrm{Var}[\hat{\beta}_{Ridge} ] &= (X^TX  +\lambda I)^{-1}X^T)\mathrm{Var}[y](X^TX  +\lambda I)^{-1}X^T)^T \\
@@ -135,7 +136,7 @@ pred=test.mat[,names(modelCoeffs)]%*%modelCoeffs
 test_MSE_Forward = mean((college.test$Outstate-pred)^2)
 ````
 
-Using the `regsubsets` forward selection is performed on the test data set.  The model with the last BIC is chosen as this penalizes models with more variables. This model has `r numCoeffs` coefficients , excluding the intercept, a test MSE of `r test_MSE_Forward` and the following coefficients:  
+Using the `regsubsets` forward selection is performed on the test data set. The model with the last BIC is chosen as this penalizes models with more variables. This model has `r numCoeffs` coefficients , excluding the intercept, a test MSE of `r test_MSE_Forward` and the following coefficients:  
 
 ``` {r, eval = TRUE, echo = TRUE}
 modelCoeffs
@@ -145,7 +146,7 @@ Note that we have not trained the model on the full dataset in order to compare 
 
 ## e)
 ``` {r, eval = TRUE, echo = TRUE}
-#Calulate the best lambda using 10 fold CV
+#Calulate the best lambda using 10-fold CV
 cv.out=cv.glmnet(x=train.mat[,2:18],y =college.train$Outstate, alpha=1)
 bestlam=cv.out$lambda.min
 #Get coeffs of best model
@@ -155,12 +156,12 @@ coefsLasso = coef(cv.out, s="lambda.min")
 lasso.pred=predict(cv.out, newx=test.mat[,2:18], s="lambda.min")
 test_MSE_Lasso = mean((lasso.pred-college.test$Outstate)^2)
 ````
-Using the `cv.glmnet` ¨the value for $\lambda$ is chosen by testing a sequence of $\lambda$-values with 10-fold cross validation. The $\lambda$-value with the lowest cross validation error is `r bestlam`. The set test MSE on the test data is `r test_MSE_Lasso` and so it is lower than using forward selection and BIC. The variables selected are:
+Using the `cv.glmnet` the value for $\lambda$ is chosen by testing a sequence of $\lambda$-values with 10-fold cross validation. The $\lambda$-value with the lowest cross validation error is `r bestlam`. The MSE on the test data is `r test_MSE_Lasso` and so it is lower than using forward selection and BIC. The variables selected are:
 
 ``` {r, eval = TRUE, echo = TRUE}
 coefsLasso[1:18,]
 ``` 
-Notice that the the lasso model gives a nonzero value for all coefficients, bu as the high values for the same coefficients as forward selection.
+Notice that the the lasso model gives a nonzero value for all coefficients, but as the high values for the same coefficients as forward selection.
 
 # Problem 2
 
@@ -168,12 +169,12 @@ Notice that the the lasso model gives a nonzero value for all coefficients, bu a
 FALSE, FALSE, TRUE, TRUE
 
 ## b)
-The basis functions for the cubic spline with knots $d_1$, $d_2$ and $d_3$ are
+The basis functions for the cubic spline with knots $d_1$, $d_2$ and $d_3$ at the quantiles $q_1$, $q_2$ and $q-3$ are
 $$
 \begin{aligned}
-& x & h(x,d_1)\\
-& x^2 & h(x,d_2) \\
-& x^3 & h(x,d_2), 
+& b_1(x) = x & b_4(x) = h(x,d_1)\\
+& b_2(x) = x^2 & b_5(x) = h(x,d_2) \\
+& b_3(x) = x^3 & b_6(x) = h(x,d_3), 
 \end{aligned}
 $$
 where 
@@ -235,7 +236,7 @@ legend("topleft", legend=c("Degree 6", "Degree 7", "Degree 8", "Degree 9", "Degr
 
 
 ```
-In the two plots above show regression with polynomials of different degrees.
+The two plots above show regression with polynomials of different degrees.
 
 ### ii)
 
@@ -261,7 +262,7 @@ for (i in seq(1, 10, by=2)){
 }
 cat("smooth:",test_MSE_smooth)
 ```
-The test MSEs are printed above. I would have expected that polynomials of high order would give high error because of overfitting witch seems to be the case for the polynomial regression. The reason for the high test MSE for the smoothing spline can be similarly explained by the relatively high degree of freedom. 
+The test MSEs are printed above. I would have expected that polynomials of high order would give high error because of overfitting which seems to be the case for the polynomial regression. The reason for the high test MSE for the smoothing spline can be similarly explained by the relatively high degree of freedom. 
 
 
 # Problem 3
@@ -331,7 +332,7 @@ In the end, we find the lowest MSE (or estimated SD in our case) for the boostin
 |Random forest|1802.9|
 |Boosting|1768.6|
 
-We would hence prefer to use this model, even though it is less interpretable than the regression tree. However, as seen below we could find the relative importance by how the different variables contribute to reducing the MSE.
+We would hence prefer to use this model, even though it is less interpretable than the regression tree. However, as seen below we could find the relative importance by how the different variables contribute to reducing the MSE. It is also expected that trees have high variance and small changes in the data can cause large changes in the final tree.
 
 ``` {r, eval = TRUE, echo = TRUE}
 set.seed(1234)
