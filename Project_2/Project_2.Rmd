@@ -202,7 +202,7 @@ ggarrange(
   ) 
 
 ```
-From the scatter plots above `Room.Board` and `perc.alumni` seem to have a linear relationship with `Outstate`. Conversely, `Terminal`, `Expend` and to some degree `Grad.Rate` seem to benefit form a non-linear transformation. There are also other plots that could have been used. For example Q–Q plots of standardized residual or test MSE for different degree of polynomial regression.
+From the scatter plots above `Room.Board` and `perc.alumni` seem to have a linear relationship with `Outstate`. Conversely, `Terminal`, `Expend` and to some degree `Grad.Rate` seem to benefit form a non-linear transformation. There are also other plots that could have been used. For example Q–Q plots of standardized residual or test MSE for different degree of polynomial regression. We could also have performed ANOVA tests.
 
 ## d)
 
