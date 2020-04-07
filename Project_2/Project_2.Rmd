@@ -30,7 +30,7 @@ knitr::opts_chunk$set(eval = TRUE, echo = TRUE,tidy=TRUE,message=FALSE,warning=F
 #install.packages("randomForest")
 #install.packages("gbm")
 #install.packages("ggfortify")
-install.packages("CRAN")
+#install.packages("CRAN")
 
 library(knitr)
 library(rmarkdown)
@@ -59,9 +59,15 @@ theme_set(theme_bw())
 From the textbook we know that the ridge regression estimator $\hat{\beta}_{Ridge}$ is given by the optimization problem. 
 
 $$
-\min_{\beta\in \mathbb{R}^{p+1})}{(\left\| y-X\beta\ \right\|_2^2+\lambda \left\| I\beta\ \right\|_2^2),}
+\min_{\hat{\beta}_0 \in \mathbb{R}, \hat{\beta}_{Ridge}\in \mathbb{R}^{p}}{(\left\| y -  \hat{\beta}_0\boldsymbol{1} - X\hat{\beta}_{Ridge} \right\|_2^2+\lambda \left\| \hat{\beta}_{Ridge} \right\|_2^2),}
 $$
-where $X$ is the data matrix, $y$ is the measured response and $\beta$ is ridge regression estimator. Also note that $I = diag(0,1,...,1)$, so that intercept is not penalized. The function to be minimized is a non-negative polynomial. Therefore it's minimal value exists and is a singular value. Thus $\hat{\beta}_{Ridge}$ must be such that
+where $X$ is the data matrix, $y$ is the measured response and $\hat{\beta}_0 = \overline{y}$ is the intercept estimate. As $\hat{\beta}_0$ is known, we can center the columns of $X$ and $y$, and  exclude the intercept column from $X$. This results in the equvilant problem. 
+
+$$
+\min_{\beta \in \mathbb{R}^{p}}{(\left\| y - X\beta \right\|_2^2+\lambda \left\| \beta \right\|_2^2),}
+$$
+
+where $\beta := \hat{\beta}_{Ridge}$ for ease of readability. The function to be minimized is a non-negative polynomial. Therefore it's minimal value exists and is a singular value. Thus $\hat{\beta}_{Ridge}$ must be such that
 $$
 \frac{\partial }{\partial\beta } (\left\| y-X\beta\ \right\|_2^2+\lambda \left\| \beta\ \right\|_2^2) = 0.
 $$
@@ -161,7 +167,7 @@ Using the `cv.glmnet` the value for $\lambda$ is chosen by testing a sequence of
 ``` {r, eval = TRUE, echo = TRUE}
 coefsLasso[1:18,]
 ``` 
-Notice that the the lasso model gives a nonzero value for all coefficients, but as the high values for the same coefficients as forward selection.
+Notice that the the lasso model gives a nonzero values for all coefficients even though it is a sparse method. It does however give small coefficients for the covariates rejected by forward selection. 
 
 # Problem 2
 
@@ -169,19 +175,19 @@ Notice that the the lasso model gives a nonzero value for all coefficients, but 
 FALSE, FALSE, TRUE, TRUE
 
 ## b)
-The basis functions for the cubic spline with knots $d_1$, $d_2$ and $d_3$ at the quantiles $q_1$, $q_2$ and $q-3$ are
+The basis functions for the cubic spline with knots the quantiles $q_1$, $q_2$ and $q_3$ are
 $$
 \begin{aligned}
-& b_1(x) = x & b_4(x) = h(x,d_1)\\
-& b_2(x) = x^2 & b_5(x) = h(x,d_2) \\
-& b_3(x) = x^3 & b_6(x) = h(x,d_3), 
+& b_1(x) = x & b_4(x) = h(x,q_1)\\
+& b_2(x) = x^2 & b_5(x) = h(x,q_2) \\
+& b_3(x) = x^3 & b_6(x) = h(x,q_3), 
 \end{aligned}
 $$
 where 
 $$
-h(x,d) = 
+h(x,q) = 
 \begin{cases} 
-   (x-d)^3  &\mathrm{if} \ x>d \\
+   (x-q)^3  &\mathrm{if} \ x>q\\
     0       &\mathrm{otherwise}
  \end{cases}
 $$
@@ -189,7 +195,7 @@ $$
 ## c)
 ``` {r, eval = TRUE, echo = TRUE,  fig1, fig.height = 6, fig.width = 9, fig.align = "center"}
 # scatterplots 
-p1 = ggplot(data=College, aes(x=Private, y=Outstate)) + geom_point()  
+p1 = ggplot(data=College, aes(x=Private, y=Outstate)) + geom_boxplot()  
 p2 = ggplot(data=College, aes(x=Room.Board, y=Outstate)) + geom_point() 
 p3 = ggplot(data=College, aes(x=Terminal, y=Outstate)) + geom_point()  
 p4 = ggplot(data=College, aes(x=perc.alumni, y=Outstate)) + geom_point() 
@@ -210,7 +216,9 @@ From the scatter plots above `Room.Board` and `perc.alumni` seem to have a linea
 ### i)
 ``` {r, eval = TRUE, echo = TRUE, fig2, fig.height = 5, fig.width = 10, fig.align = "center"}
 
-poly_MSE_errors = rep(NA,10)
+poly_MSE_train = rep(NA,10)
+poly_MSE_test = rep(NA,10)
+
 par(mfrow=c(1,2))
 plot(college.train$Terminal,college.train$Outstate, xlab="Terminal", ylab="Outstate")
 for (i in 1:10){
@@ -221,9 +229,13 @@ for (i in 1:10){
   k=i %% 5 
   lines(x0,  y0, col=k,lty=k)
   
-  #Calculate test MSE 
+  #Calculate training MSE
+  pred.poly.train = predict.lm(reg.poly,newdata=list(Terminal=college.train$Terminal))
+  poly_MSE_train[i] = mean((pred.poly.train-college.train$Outstate)^2)
+  
+  #Calculate test MSE
   pred.poly = predict.lm(reg.poly,newdata=list(Terminal=college.test$Terminal))
-  poly_MSE_errors[i] = mean((pred.poly-college.test$Outstate)^2)
+  poly_MSE_test[i] = mean((pred.poly-college.test$Outstate)^2)
   
   # Plot in two figures
   if (i==5){
@@ -247,6 +259,9 @@ plot(college.train$Expend,college.train$Outstate, xlab="Expend", ylab="Outstate"
 lines(reg.smooth, col="blue")
 legend("bottomright", legend=c("smoothing spline"), col=("blue"),lty=1, cex=0.8)
 
+pred.smooth.train = predict(reg.smooth,newdata=list(Expend=college.train$Expend))
+train_MSE_smooth = mean((pred.smooth.train$y-college.train$Outstate)^2)
+
 pred.smooth = predict(reg.smooth,newdata=list(Expend=college.test$Expend))
 test_MSE_smooth = mean((pred.smooth$y-college.test$Outstate)^2)
 ```
@@ -254,14 +269,17 @@ In the plot above shows smoothing spline regression of `Outstate` depending on `
 
 ### iii)
 ``` {r, eval = TRUE, echo = TRUE}
-cat("Test MSEs: \n")
+cat("Training MSEs: \n")
 for (i in seq(1, 10, by=2)){
-  cat("deg",i,":",poly_MSE_errors[i])
-  cat(", deg",i+1,":",poly_MSE_errors[i+1])
+  cat("deg",i,":",poly_MSE_train[i])
+  cat(", deg",i+1,":",poly_MSE_train[i+1])
   cat("\n")
 }
-cat("smooth:",test_MSE_smooth)
+cat("smooth:",train_MSE_smooth)
 ```
+The training MSEs are printed above. I would have expected that polynomials regression of high order would give lower training MSEs as they are more flexible. The smoothing spline seemed to fit the data well, but had a high training MSE. This might be because of high variance in the dataset. 
+
+Move this to 3d)
 The test MSEs are printed above. I would have expected that polynomials of high order would give high error because of overfitting which seems to be the case for the polynomial regression. The reason for the high test MSE for the smoothing spline can be similarly explained by the relatively high degree of freedom. 
 
 
