@@ -732,9 +732,10 @@ abline(a=cutoff,b=0)
 important_genes = which(gene_PC_1 > cutoff)
 biplot(gene_pca$x[,1:2],gene_pca$rotation[important_genes,])
 ```
+
 ## f)
 
-Finally we use K-means clustering to separate the two groups of tissue and see that in fact, this algorithm is also fully succsessfully, having an error rate of zero. 
+Finally we use K-means clustering to separate the two groups of tissue and see that in fact, this algorithm is also fully successfully, having an error rate of zero. 
 
 ``` {r, eval = TRUE, echo = TRUE}
 gene_km = kmeans(as.matrix(GeneData),2,nstart=20)
