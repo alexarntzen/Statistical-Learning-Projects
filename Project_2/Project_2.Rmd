@@ -56,17 +56,14 @@ theme_set(theme_bw())
 # Problem 1
 
 ## a)
-From the textbook we know that the ridge regression estimator $\hat{\beta}_{Ridge}$ is given by the optimization problem. 
-
+From the textbook we know that the ridge regression estimator $\hat{\beta}_{Ridge}$ is given by the optimization problem
 $$
 \min_{\hat{\beta}_0 \in \mathbb{R}, \hat{\beta}_{Ridge}\in \mathbb{R}^{p}}{(\left\| y -  \hat{\beta}_0\boldsymbol{1} - X\hat{\beta}_{Ridge} \right\|_2^2+\lambda \left\| \hat{\beta}_{Ridge} \right\|_2^2),}
 $$
-where $X$ is the data matrix, $y$ is the measured response and $\hat{\beta}_0 = \overline{y}$ is the intercept estimate. As $\hat{\beta}_0$ is known, we can center the columns of $X$ and $y$. This results in the equivalent problem. 
-
+where $X$ is the data matrix, $y$ is the measured response and $\hat{\beta}_0 = \overline{y}$ is the intercept estimate. As $\hat{\beta}_0$ is known, we can center the columns of $X$ and $y$. This results in the equivalent problem
 $$
 \min_{\beta \in \mathbb{R}^{p}}{(\left\| y - X\beta \right\|_2^2+\lambda \left\| \beta \right\|_2^2),}
 $$
-
 where $\beta := \hat{\beta}_{Ridge}$ for ease of readability. The function to be minimized is a non-negative polynomial. Therefore it's minimal value exists and is a singular value. Thus $\hat{\beta}_{Ridge}$ must be such that
 $$
 \frac{\partial }{\partial\beta } (\left\| y-X\beta\ \right\|_2^2+\lambda \left\| \beta\ \right\|_2^2) = 0.
@@ -120,7 +117,6 @@ $$
 TRUE, FALSE, FALSE, TRUE 
 
 ## d)
-
 ``` {r, eval = TRUE, echo = TRUE}
 set.seed(1)
 train.ind = sample(1:nrow(College), 0.5 * nrow(College)) 
@@ -143,7 +139,6 @@ test_MSE_Forward = mean((college.test$Outstate-pred)^2)
 ````
 
 Using the `regsubsets` forward selection is performed on the test data set. The model with the last BIC is chosen as this penalizes models with more variables. This model has `r numCoeffs` coefficients , excluding the intercept, a test MSE of `r test_MSE_Forward` and the following coefficients:  
-
 ``` {r, eval = TRUE, echo = TRUE}
 modelCoeffs
 ```
@@ -163,11 +158,11 @@ lasso.pred=predict(cv.out, newx=test.mat[,2:18], s="lambda.min")
 test_MSE_Lasso = mean((lasso.pred-college.test$Outstate)^2)
 ````
 Using the `cv.glmnet` the value for $\lambda$ is chosen by testing a sequence of $\lambda$-values with 10-fold cross validation. The $\lambda$-value with the lowest cross validation error is `r bestlam`. The MSE on the test data is `r test_MSE_Lasso` and so it is lower than using forward selection and BIC. The variables selected are:
-
 ``` {r, eval = TRUE, echo = TRUE}
 coefsLasso[1:18,]
 ``` 
 Notice that the the lasso model gives a nonzero values for all coefficients even though it is a sparse method. It does however give small coefficients for the covariates rejected by forward selection. 
+
 
 # Problem 2
 
@@ -175,7 +170,7 @@ Notice that the the lasso model gives a nonzero values for all coefficients even
 FALSE, FALSE, TRUE, TRUE
 
 ## b)
-The basis functions for the cubic spline with knots the quantiles $q_1$, $q_2$ and $q_3$ are
+The basis functions for the cubic spline with knots the quartiles $q_1$, $q_2$ and $q_3$ are
 $$
 \begin{aligned}
 & b_1(x) = x & b_4(x) = h(x,q_1)\\
@@ -251,7 +246,6 @@ legend("topleft", legend=c("Degree 6", "Degree 7", "Degree 8", "Degree 9", "Degr
 The two plots above show regression with polynomials of different degrees.
 
 ### ii)
-
 ``` {r, eval = TRUE, echo = TRUE}
 reg.smooth=smooth.spline(x=college.train$Expend, y=college.train$Outstate,cv=TRUE)
 
@@ -283,14 +277,9 @@ The training MSEs are printed above. I would have expected that polynomials regr
 # Problem 3
 
 ## a)
-
-1. False
-2. True
-3. True
-4. False
+FALSE, TRUE, TRUE, FALSE
 
 ## b)
-
 We try to make models based on a regression tree, random forest and by using boosting. The aim is to predict the variable *Outstate* by using the other variables in the *College* dataset as predictors.
 
 ``` {r, eval = TRUE, echo = FALSE}
@@ -314,7 +303,6 @@ abline(a=0,b=1)
 
 We do the same as above, only using a random forest model. On the plot below we observe how the random forest yields an estimate $\hat y$ that is no longer discrete as we saw for the regression tree. This follow from the fact that the random forest is an average of many different regression trees (as data is drawn by boostrapping), in our case $n_{tree} = 1000$.
 
-
 ``` {r, eval = TRUE, echo = TRUE}
 rf = randomForest(Outstate~.,data=college.train,mtry=p-1,ntree=1000)
 yhat = predict(rf,newdata=college.test)
@@ -326,7 +314,6 @@ cat("The standard deviation when using a random forest model is: ",sqrt(MSE.ranf
 plot(yhat,y)
 abline(a=0,b=1)
 ```
-
 
 Finally we use a boosting model, however in this case there are multiple tuning parameters that should be set by using cross validation. Below, we have implemented a k-fold cross validation scheme to find the optimal number of trees $B$, the shrinkage parameter $\lambda$ and the interaction depth $d$.
 
@@ -353,7 +340,6 @@ MSE.boost = mean((yhat-y)^2)
 cat("The standard deviation when using a boosting model is:",sqrt(MSE.boost))
 
 ```
-
 
 ``` {r, eval = TRUE, echo = TRUE}
 #cross validation
@@ -413,7 +399,6 @@ kFoldCV = function(k,data,paramInterval,param) {
 }
 ```
 
-
 ``` {r, eval = FALSE, echo = TRUE}
 set.seed(1234)
 
@@ -427,7 +412,6 @@ resS = kFoldCV(5,college.train,pIntShrinkage,"shrinkage")
 resI = kFoldCV(5,college.train,pIntInteraction,"interaction")
 ```
 
-
 ``` {r, eval = FALSE, echo = TRUE}
 # Plotting SD vs Parametes from CV
 plot(resT[,1],resT[,2],type="b",ylab="SD",xlab="Number of trees")
@@ -436,8 +420,6 @@ plot(resI[,1],resI[,2],type="b",ylab="SD",xlab="Interaction depth")
 ```
 
 ## c)
-
-
 ``` {r, eval = TRUE, echo = TRUE}
 method.Poly = rep("Polynomial of degree ",10)
 for (i in 1:10){
@@ -458,6 +440,7 @@ We see that polynomials of high order give large error because of overfitting. H
 
 We notice that the boosting algorithm yields the lowest test MSE. However, it is less preferable when in comes to the degree of interpretability. Here, the simple and intuitive structure of the regression tree is to be preferred, but comes at the cost of larger test error. Regression with forward selection finds the most important variables (in our case 6) and could be said to be slightly easier to interpret than the other methods except for the regression tree. In general we also see that the linear models performed worse than Boosting. This indicates that the response is not well approximated by a linear model.
 
+
 # Problem 4
 In this problem we use the data set of diabetes from a population of women of Pima Indian heritage in the US. We split the data set into a training set of 300 observations, where 200 are non-diabetic and 100 are diabetic, and a test with of 232 observations, where 155 are non-diabetic and 77 are diabetic. 
 
@@ -470,13 +453,6 @@ d.test = d.diabetes$ctest
 ```
 
 ## a)
-```{r, eval = TRUE, echo = TRUE}
-# DENNE FJERNES FØR INNLEVERING, LAR DEN STÅ ENN SÅ LENGE SÅ DEN SOM SKAL SE OVER HAR NOE Å TA UTGANGSPUNKT I
-summary(d.train)
-cor(d.train)
-corrplot(cor(d.train))
-ggpairs(d.train)
-```
 TRUE, TRUE, TRUE, TRUE 
 
 ## b)
@@ -582,7 +558,6 @@ Then, since $f(x_i)$ corresponds to the linear predictor in logistic regression,
 
 
 # Problem 5
-
 ``` {r, eval = TRUE, echo = TRUE}
 id = "1VfVCQvWt121UN39NXZ4aR9Dmsbj-p9OU" # google file ID
 GeneData = read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download",id), header = F)
@@ -593,10 +568,7 @@ GeneData = t(GeneData)
 ```
 
 ## a)
-
 In this task we study the measurements of $1000$ genes from $40$ tissue samples. We know that the first $20$ tissue samples come from healthy patients and the remaining come from patients with disease. We will use different clustering method and principal component analysis to try to separate the two groups and study the data. 
-
-
 
 ``` {r, eval = TRUE, echo = TRUE}
 gene_complete = hclust(dist(GeneData),method="complete")
@@ -621,7 +593,6 @@ plot(gene_average_cor)
 Above you will find six clusterings, where the plots columnwise uses the different linkages: complete, single and average, and the plots rowwise uses the different distance measures: Euclidean and correlation. 
 
 ## b)
-
 Below we compare the classification of the different clustering methods and find that all clusters using euclidian distance all classify the tissue correctly with $k=2$ cuts.Furthermore we find that none of the correlation based hierarchical clustering methods obtain a successful separation between the two classes with two cuts. However, by cutting the tree with correlation based distance and complete linkage such that we get 5 clusters, we have get one cluster with cancer tissue and the rest with healthy tissue. 
 
 Furthermore, we see that the Euclidean distance with complete has the most balanced tree, hence this could be prefered.
@@ -639,7 +610,6 @@ cbind(dc,ds,da,cc,cs,ca)
 
 As an additional analysis we use the heatmap-function in R to plot dendrograms applied to both the rows and columns in the GeneData. This displays in a beautiful manner that we have a group of genes that seems to separate the patients with cancer and without cancer. By cutting the tree classifying the different genes in two we can find the genes that seem to predict cancer.
 
-
 ``` {r, eval = TRUE, echo = TRUE}
 heatmap(as.matrix(t(GeneData)),Rowv=as.dendrogram(gene_complete_column), Colv=as.dendrogram(gene_complete))
 
@@ -648,14 +618,12 @@ important_genes_clust = which(cutree(gene_complete_column,k=2)==2)
 
 Finally we also plot the tissue with regards to the measure of two different genes that both are identified as "important" from the above analysis. We mark them with colour based on the hierarchical clustering with Euclidean distance and complete linkage.
 
-
 ``` {r, eval = TRUE, echo = TRUE}
 plot(GeneData[,502],GeneData[,565],col=cutree(gene_complete,2),pch=".",ylab="G565",xlab="G502")
 text(GeneData[,502],GeneData[,565],rownames(GeneData),col=cutree(gene_complete,2))
 ```
 
 ## c)
-
 There are multiple ways to motivate Principal Component Analysis, but recalling the spectral theorem from linear algebra provides a useful framework for understanding and explanation:
 
 >**Spectral Theorem**
@@ -674,12 +642,10 @@ $$
 S = \frac{X^TX}{n}
 $$
 
-We note that $S$ is in fact symmetric and hence normal, allowing for the spectral decomposition described above
-
+We note that $S$ is in fact symmetric and hence normal, allowing for the spectral decomposition described above,
 $$
 S = \frac{1}{n}U\Lambda U^{T}
 $$
-
 Where the columns of $U = [u_1,\cdots,u_n]$ are the eigenvectors of $X^TX$ and the diagonal entries $\Lambda = \text{diag}\{\lambda_1,\cdots,\lambda_n\}$ the corresponding eigenvalues. Notice that as $U$ is unitary, the eigenvectors are orthonormal, meaning $u_i^Tu_j = \delta_{i,j}, i,j = 0,\cdots,n$. Finally, lets also assume that $\Lambda$ and $U$ is permutated in a way such that $\lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_n$.
 
 We now notice that as $X^TX = U\Lambda U^T$ we have that 
@@ -687,7 +653,6 @@ We now notice that as $X^TX = U\Lambda U^T$ we have that
 $$
 U^TX^TXU = \Lambda
 $$
-
 And by dividing the expression above with $n$ we see that the transformation $Z = XU$ yield the very orderly estimated covariance matrix $\frac{1}{n}\Lambda$ which is diagonal with decreasing variances $\frac{\lambda_1}{n},\cdots,\frac{\lambda_n}{n}$. 
 
 The columns of $Z$ are then the principal components $z_m, m=0,\cdots,n$ with decreasing variance $\frac{\lambda_m}{n}$. For some reason unknown to the author, the elements of the principal components are also called scores and hence the scores of the first principal components would be given as
@@ -699,7 +664,6 @@ $$
 As we have chosen to derive the PCA in a different way that what is done in the lecture notes, there are some differences in the notation. $p,n,X$ are the same, while we denote the matrix $\phi$ as $U$. Meaning we have the first column in $U$ as $u_1 = \phi_1$.
 
 ## d)
-
 We will now perform a principal component analysis on the gene data.
 
 ``` {r, eval = TRUE, echo = TRUE}
@@ -719,9 +683,7 @@ print("Proportion of variance explained by the 5 first PCs:")
 print(sum(prop_var[1:5]))
 ```
 
-
 ## e)
-
 Below we plot the scores, or the weights of the different elements of the first principal component. Here we clearly see that there is a group of genes with a larger score than the others and find a cutoff value at $0.06$ to separate the two. We also identified genes that vary greatly between the different groups from the heatmap above. It could be seen that the two groups are almost identical. On the bottom plot we have a biplot with the genes identified.
 
 ``` {r, eval = TRUE, echo = TRUE}
@@ -734,7 +696,6 @@ biplot(gene_pca$x[,1:2],gene_pca$rotation[important_genes,])
 ```
 
 ## f)
-
 Finally we use K-means clustering to separate the two groups of tissue and see that in fact, this algorithm is also fully successfully, having an error rate of zero. 
 
 ``` {r, eval = TRUE, echo = TRUE}
@@ -743,7 +704,3 @@ plot(gene_pca$x[,1:2],pch=".")
 text(gene_pca$x[,1:2],rownames(GeneData),col=gene_km$cluster+1)
 gene_km$cluster
 ```
-
-
-
-
