@@ -444,16 +444,19 @@ for (i in 1:10){
   method.Poly[i] = paste(method.Poly[i], i)
 }
 
-MSE.table1 = data.frame(Method = method.Poly , test_MSE = poly_MSE_test)
+MSE.table1 = data.frame(Method = method.Poly , SD = sqrt(poly_MSE_test))
 methods = c("Forward selection", "Lasso", "Smoothing spline","Regression Tree", "Boosting")
-MSEs = c(test_MSE_Forward, test_MSE_Lasso, test_MSE_smooth,MSE_regtree, MSE.boost)
-MSE.table2 = data.frame(Method=methods ,test_MSE = MSEs)
+MSEs = sqrt(c(test_MSE_Forward, test_MSE_Lasso, test_MSE_smooth,MSE_regtree, MSE.boost))
+MSE.table2 = data.frame(Method=methods ,SD = MSEs)
 
 print(union(MSE.table1, MSE.table2))
 ```
-The test MSEs are printed above. We see that polynomials of high order give large error because of overfitting. However, some high order polynomials did have low test MSE indications a nonlinear relationship between  `Outstate`and `Expend`. The reason for the high test MSE for the smoothing spline can be similarly explained by the relatively high degree of freedom. As polynomial and smoothing spline regression were performed with only one covariate it is expected that these models had higher test MSE than the rest. 
+The test MSEs, are here given as test standard deviation ($\hat{SD} = \sqrt{MSE}$) in order to obtain a error measure with the same unit (and scale) as the OutState tuition, are printed above.
 
-We also see that the linear models performed worse than Boosting. This indicates that the response is not well approximated by a linear model. Still, if interpretability was the highest priority the tree model would probably be the best choice. 
+We see that polynomials of high order give large error because of overfitting. However, some high order polynomials did have low test MSE indications a nonlinear relationship between  Outstateand Expend. The reason for the high test MSE for the smoothing spline can be similarly explained by the relatively high degree of freedom. As polynomial and smoothing spline regression were performed with only one covariate it is expected that these models had higher test MSE than the rest. 
+
+
+We notice that the boosting algorithm yields the lowest test MSE. However, it is less preferable when in comes to the degree of interpretability. Here, the simple and intuitive structure of the regression tree is to be preferred, but comes at the cost of larger test error. Regression with forward selection finds the most important variables (in our case 6) and could be said to be slightly easier to interpret than the other methods except for the regression tree. In general we also see that the linear models performed worse than Boosting. This indicates that the response is not well approximated by a linear model.
 
 # Problem 4
 In this problem we use the data set of diabetes from a population of women of Pima Indian heritage in the US. We split the data set into a training set of 300 observations, where 200 are non-diabetic and 100 are diabetic, and a test with of 232 observations, where 155 are non-diabetic and 77 are diabetic. 
