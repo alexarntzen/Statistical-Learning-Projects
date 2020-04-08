@@ -399,7 +399,7 @@ kFoldCV = function(k,data,paramInterval,param) {
 }
 ```
 
-``` {r, eval = FALSE, echo = TRUE}
+``` {r, eval = TRUE, echo = TRUE}
 set.seed(1234)
 
 pIntTrees = seq(1,2000,100)
@@ -412,7 +412,7 @@ resS = kFoldCV(5,college.train,pIntShrinkage,"shrinkage")
 resI = kFoldCV(5,college.train,pIntInteraction,"interaction")
 ```
 
-``` {r, eval = FALSE, echo = TRUE}
+``` {r, eval = TRUE, echo = TRUE}
 # Plotting SD vs Parametes from CV
 plot(resT[,1],resT[,2],type="b",ylab="SD",xlab="Number of trees")
 plot(resS[,1],resS[,2],type="b",ylab="SD",xlab="Shrinkage")
