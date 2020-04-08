@@ -593,9 +593,14 @@ plot(gene_average_cor)
 Above you will find six clusterings, where the plots columnwise uses the different linkages: complete, single and average, and the plots rowwise uses the different distance measures: Euclidean and correlation. 
 
 ## b)
+<<<<<<< HEAD
 Below we compare the classification of the different clustering methods and find that all clusters using euclidian distance all classify the tissue correctly with $k=2$ cuts.Furthermore we find that none of the correlation based hierarchical clustering methods obtain a successful separation between the two classes with two cuts. However, by cutting the tree with correlation based distance and complete linkage such that we get 5 clusters, we have get one cluster with cancer tissue and the rest with healthy tissue. 
+=======
 
-Furthermore, we see that the Euclidean distance with complete has the most balanced tree, hence this could be prefered.
+Below we compare the classification of the different clustering methods and find that all clusters using euclidian distance all classify the tissue correctly with $k=2$ cuts. Furthermore we find that none of the correlation based hierarchical clustering methods obtain a successful separation between the two classes with two cuts. However, by cutting the tree with correlation based distance and complete linkage such that we get 5 clusters, we have get one cluster with cancer tissue and the rest with healthy tissue. 
+>>>>>>> 49dda26ae4f6c3c62a8c64c1c9f40cd52d4fdb25
+
+Furthermore, we see that the Euclidean distance with complete has the most balanced tree, hence this could be preferred.
 
 ``` {r, eval = TRUE, echo = TRUE}
 dc = cutree(gene_complete,k=2)
