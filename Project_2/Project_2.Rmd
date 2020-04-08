@@ -3,9 +3,9 @@ title: 'Compulsory exercise 2: Group 12'
 author: "Emma Skarnes, Håkon Noren  and Alexander Johan Arntzen"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
 subtitle: TMA4268 Statistical Learning V2020
 ---
   
@@ -148,7 +148,7 @@ Using the `regsubsets` forward selection is performed on the test data set. The 
 modelCoeffs
 ```
 
-Note that we have not trained the model on the full dataset in order to compare the test MSE between d) and e). 
+Note that we have not trained the model on the full dataset in order to compare the test MSE. 
 
 ## e)
 ``` {r, eval = TRUE, echo = TRUE}
