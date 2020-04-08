@@ -3,9 +3,9 @@ title: 'Compulsory exercise 2: Group 12'
 author: "Emma Skarnes, Håkon Noren  and Alexander Johan Arntzen"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
-  pdf_document: default
   html_document:
     df_print: paged
+  pdf_document: default
 subtitle: TMA4268 Statistical Learning V2020
 ---
   
@@ -622,7 +622,7 @@ Above you will find six clusterings, where the plots columnwise uses the differe
 
 ## b)
 
-Below we compare the classification of the different clustering methods and find that all clusters using euclidian distance all classify the tissue correctly. Furthermore we find that none of the correlation based hierarchical clustering methods. However, by cutting the tree with correlation based distance and complete linkage such that we get 5 clusters, we have get one cluster with cancer tissue and the rest with healthy tissue. 
+Below we compare the classification of the different clustering methods and find that all clusters using euclidian distance all classify the tissue correctly with $k=2$ cuts.Furthermore we find that none of the correlation based hierarchical clustering methods obtain a successful separation between the two classes with two cuts. However, by cutting the tree with correlation based distance and complete linkage such that we get 5 clusters, we have get one cluster with cancer tissue and the rest with healthy tissue. 
 
 Furthermore, we see that the Euclidean distance with complete has the most balanced tree, hence this could be prefered.
 
@@ -696,7 +696,7 @@ $$
 z_1 = Xu_1
 $$ 
 
-As we have chosen to derive the PCA in a different way that what is done in the lecture notes, there are some differences in the notation. $p,n,X$ are the same, while we denote the matrix $\phi$ as $U$.
+As we have chosen to derive the PCA in a different way that what is done in the lecture notes, there are some differences in the notation. $p,n,X$ are the same, while we denote the matrix $\phi$ as $U$. Meaning we have the first column in $U$ as $u_1 = \phi_1$.
 
 ## d)
 
@@ -714,8 +714,8 @@ Above we have used the first and second principal component to plot the tissue s
 ``` {r, eval = TRUE, echo = TRUE}
 var = gene_pca$sdev^2
 prop_var = var/sum(var)
-plot(prop_var,pch=20,xlab="Principal components",ylab="Variance")
-print("Variancre explained by the 5 first PCs:")
+plot(prop_var,pch=20,xlab="Principal components",ylab="Proportion of variance")
+print("Proportion of variance explained by the 5 first PCs:")
 print(sum(prop_var[1:5]))
 ```
 
