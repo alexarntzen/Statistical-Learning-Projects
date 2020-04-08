@@ -535,7 +535,7 @@ $$
   \implies P(y_i | x; \beta) = \frac{e^{f(x_i)}}{1 + e^{f(x_i)}} = \frac{1}{1 + e^{-f(x_i)}}.
 \end{split}
 $$
-Let $\sigma$ be a function such that $P(y_i = 1 | x_i) = \sigma(x_i)$ and $P(y_i = -1 | x_i) = 1 - \sigma(x_i) = \sigma(-x_i)$, where the last equality comes from the properties of the function and can easily be seen by rewriting the equation a little bit. The cumulative distribution function can then be written as $P(y_i | x_i) = \sigma(x_i)^{y_i} (1-\sigma(x_i))^{1-y_i}$, which we recognize as a binomial PMF with $p = \sigma(x_i)$.
+Let $\sigma$ be a function such that $P(y_i = 1 | x_i) = \sigma(x_i)$ and $P(y_i = -1 | x_i) = 1 - \sigma(x_i) = \sigma(-x_i)$, where the last equality comes from the properties of the function and can easily be seen by rewriting the equation a little bit - that is, $\sigma(x) = \frac{1}{1+e^{-x}}$. The cumulative distribution function can then be written as $P(y_i | x_i) = \sigma(x_i)^{y_i} (1-\sigma(x_i))^{1-y_i}$, which we recognize as a binomial PMF with $p = \sigma(x_i)$.
 
 Furthermore, the log-likelihood function for this logistic regression function is given by
 $$
