@@ -412,8 +412,9 @@ resS = kFoldCV(5,college.train,pIntShrinkage,"shrinkage")
 resI = kFoldCV(5,college.train,pIntInteraction,"interaction")
 ```
 
-``` {r, eval = TRUE, echo = TRUE}
+``` {r, eval = TRUE, echo = TRUE,  fig3, fig.height = 3, fig.width = 9, fig.align = "center"}
 # Plotting SD vs Parametes from CV
+par(mfrow=c(1,3))
 plot(resT[,1],resT[,2],type="b",ylab="SD",xlab="Number of trees")
 plot(resS[,1],resS[,2],type="b",ylab="SD",xlab="Shrinkage")
 plot(resI[,1],resI[,2],type="b",ylab="SD",xlab="Interaction depth")
