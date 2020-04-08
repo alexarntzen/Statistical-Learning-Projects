@@ -170,7 +170,7 @@ Notice that the the lasso model gives a nonzero values for all coefficients even
 FALSE, FALSE, TRUE, TRUE
 
 ## b)
-The basis functions for the cubic spline with knots the quartiles $q_1$, $q_2$ and $q_3$ are
+The basis functions for the cubic spline with knots at the quartiles $q_1$, $q_2$ and $q_3$ are
 $$
 \begin{aligned}
 & b_1(x) = x & b_4(x) = h(x,q_1)\\
@@ -471,16 +471,14 @@ svc = svm(diabetes ~ ., data = d.train, kernel = "linear", cost = 0.1, scale = F
 set.seed(1)
 tune.cost = tune(method = "svm", diabetes ~ ., data = d.train, kernel = "linear", 
                 ranges = list(cost = c(0.001, 0.01, 0.1, 1, 5, 10, 100)))
-summary(tune.cost)                 # 0.1 is the best cost
+#summary(tune.cost)                 # 0.1 is the best cost
 svc.bestmod = tune.cost$best.model
 
 svc.pred = predict(svc.bestmod, d.test)
 svc.ct = table(predict = svc.pred, truth = d.test$diabetes)  # Confusion table
 svc.mcr = 1 - sum(diag(svc.ct))/sum(svc.ct)                  # Misclassification error rate
-print(paste0("Confusion table: "))
-svc.ct
-print(paste0("Misclassification error rate: "))
-svc.mcr
+svc.ct # Confusion table for the support vector classifier
+svc.mcr # Misclassification error rate for the support vector classifier
 ```
 
 Similarly, we now fit a support vector machine with a radial boundary. Cross-validation is now used to find the optimal combination of cost and $\gamma$ parameters. 
@@ -492,16 +490,14 @@ set.seed(2)
 tune.costgamma = tune(method = "svm", diabetes ~ ., data = d.train, kernel = "radial", 
                 ranges = list(cost = c(0.1, 1, 5, 10, 100), 
                               gamma = c(0.5, 1, 2, 3, 4)))
-summary(tune.costgamma)
+#summary(tune.costgamma)
 svm.bestmod = tune.costgamma$best.model
 
 svm.pred = predict(svm.bestmod, d.test)
 svm.ct = table(predict = svm.pred, truth = d.test$diabetes)
 svm.mcr = 1 - sum(diag(svm.ct))/sum(svm.ct)
-print(paste0("Confusion table: "))
-svm.ct
-print(paste0("Misclassification error rate: "))
-svm.mcr
+svm.ct    # Confusion table for the support vector machine
+svm.mcr   # Misclassification error rate for the support vector machine
 ```
 Based on the confusion tables and their associated misclassification error rates, we can see that the support vector classifier performs better than the support vector machine, with a misclassification error rate of $0.228$ instead of $0.259$ for the support vector machine. Out of these two classifiers, we thus prefer the support vector classifier, even if the difference is relatively small.  
 The SVC also has both a higher sensitivity and specificity. The sensitivities for the SVC and SVM, respectively, are $0.884$ and $0.858$. The respective specificities are $0.545$ and $0.507$.  
